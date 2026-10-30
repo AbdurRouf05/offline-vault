@@ -4,7 +4,7 @@
 > Overwrite it (do not append) after every completed task and whenever the chat gets long.
 > Keep it under ~150 lines: facts and pointers, not a diary. Full user messages live in `docs/CHATLOG.md`.
 
-**Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** master · **Last commit:** f885926 fix(settings): cache PIN when enabling biometric from settings
+**Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** master · **Last commit:** f85b202 feat(notes): open notes in read mode before editing
 
 ## TL;DR
 - Project: Offline Vault, a personal Flutter (Android) password and notes vault, fully offline, with encrypted `.vault` export/import to move data to another phone.
@@ -22,9 +22,10 @@
   - `2a3a166` style: dart format for the whole codebase (it was failing the format check).
   - `462935d` fix: changing the Master PIN made all data unreadable. Now `DatabaseService.reEncryptAll` re-encrypts in one transaction before the new PIN is saved. Tests: `test/security_test.dart`.
   - `f885926` fix: the biometric toggle in Settings never cached the PIN, so fingerprint unlock always failed. It now asks for and verifies the PIN.
+  - Notes for long lists (user's real use case: a ~240-line anime list with star/check marks): `689f240` content field grows; `7f86735` unsaved-changes dialog (Simpan/Buang/Batal); `ff33c7e` preview text readable in dark mode; `f85b202` read mode screen (`note_detail_screen.dart`) with copy + edit.
 - In flight: nothing.
-- Verified: `flutter analyze` -> no issues; `flutter test` -> 8 passed; `dart format --set-exit-if-changed` -> 0 changed.
-- Device: Infinix X6853, Android 16, serial 115413743T006083. Debug APK installed and it launches fine. Manual flow test by the user is pending. The biometric fix has no automated test (UI + local_auth platform channel).
+- Verified: `flutter analyze` -> no issues; `flutter test` -> 14 passed; `dart format --set-exit-if-changed` -> 0 changed.
+- Device: Infinix X6853, Android 16, serial 115413743T006083. Latest debug APK (with notes changes) installed and launches fine. Manual flow test by the user is pending. The biometric fix has no automated test (UI + local_auth platform channel).
 
 ## Next steps
 1. User runs the smoke test on the phone: setup PIN, add a credential and a note, change the PIN, and confirm the data is still readable.

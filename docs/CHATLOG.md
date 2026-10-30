@@ -36,3 +36,9 @@
 > tes di hp
 
 **AI:** Phone authorized; built debug APK (~9 min), installed and launched on Infinix X6853 Android 16. PIN setup screen OK, no errors. Handed manual test checklist to user.
+
+### 2026-10-30 16:18
+**User:**
+> catatan unutk ini yagn saya maksud : [pasted a ~240-line personal anime list note with star/check markers as an example of the note content they want to store]
+
+**AI:** User chose all 3 notes improvements. Done: growing content field, unsaved-changes guard, read mode; plus dark-mode preview color fix. 14 tests pass. Reinstalled on phone.
