@@ -14,7 +14,7 @@ final databaseServiceProvider = Provider<DatabaseService>((ref) {
 });
 
 final backupServiceProvider = Provider<BackupService>((ref) {
-  return BackupService();
+  return BackupService(databaseService: ref.watch(databaseServiceProvider));
 });
 
 /// Key that encrypts notes at rest, loaded (or created) once at startup.

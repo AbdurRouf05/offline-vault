@@ -1,8 +1,8 @@
-// Builds an encrypted `.vault` backup from seed JSON, to load data into the
-// app through Pengaturan > Impor. Never commit seed data or the output.
+// Builds a `.vault` backup from seed JSON, to load data into the app through
+// Pengaturan > Impor. Never commit seed data or the output.
 //
-// Usage (seed JSON on stdin, backup password in an env variable):
-//   SEED_VAULT_PASSWORD=... dart run tool/make_seed_vault.dart build/seed.vault < seed.json
+// Usage (seed JSON on stdin):
+//   dart run tool/make_seed_vault.dart build/seed.vault < seed.json
 //
 // Seed JSON:
 //   {"notes": [{"title", "content", "category", "is_pinned"}]}
@@ -14,11 +14,9 @@ import 'package:offline_vault/features/notes/note_item.dart';
 import 'package:uuid/uuid.dart';
 
 Future<void> main(List<String> args) async {
-  final password = Platform.environment['SEED_VAULT_PASSWORD'] ?? '';
-  if (args.length != 1 || password.isEmpty) {
+  if (args.length != 1) {
     stderr.writeln(
-      'Usage: SEED_VAULT_PASSWORD=... '
-      'dart run tool/make_seed_vault.dart <out.vault> < seed.json',
+      'Usage: dart run tool/make_seed_vault.dart <out.vault> < seed.json',
     );
     exitCode = 64;
     return;
@@ -45,7 +43,6 @@ Future<void> main(List<String> args) async {
         ),
   ];
 
-  final content = await encodeBackup(notes: notes, password: password);
-  await File(args.single).writeAsString(content);
+  await File(args.single).writeAsString(encodeBackup(notes));
   stdout.writeln('Wrote ${args.single}: ${notes.length} notes.');
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:offline_vault/features/backup/backup_codec.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
@@ -14,23 +15,46 @@ void main() {
     updatedAt: now,
   );
 
-  test('encode then decode returns the same items', () async {
-    final content = await encodeBackup(notes: [note], password: 'pw-123');
-    expect(content.contains('konosuba'), isFalse);
+  test('encode then decode returns the same notes', () {
+    final content = encodeBackup([note]);
 
-    final notes = await decodeBackup(content, password: 'pw-123');
+    final header = jsonDecode(content) as Map<String, dynamic>;
+    expect(header['format'], backupFormat);
+    expect(header['version'], 2);
+
+    final notes = decodeBackup(content);
     expect(notes.single.toPlainMap(), note.toPlainMap());
   });
 
-  test('wrong password fails to decode', () async {
-    final content = await encodeBackup(notes: [note], password: 'right');
-    expect(decodeBackup(content, password: 'wrong'), throwsA(anything));
+  test('non-backup files are rejected', () {
+    for (final content in ['{"format":"other"}', 'not json', '[1, 2]']) {
+      expect(() => decodeBackup(content), throwsFormatException);
+    }
   });
 
-  test('non-backup file is rejected', () async {
+  test('old version 1 files are rejected with a clear message', () {
+    const v1 = '{"format":"OFFLINE_VAULT_BACKUP","version":1,"salt":"x"}';
     expect(
-      decodeBackup('{"format":"other"}', password: 'x'),
-      throwsA(isA<FormatException>()),
+      () => decodeBackup(v1),
+      throwsA(
+        isA<FormatException>().having(
+          (e) => e.message,
+          'message',
+          contains('tidak didukung'),
+        ),
+      ),
     );
+  });
+
+  test('a backup with a broken note is rejected as a whole', () {
+    final content = jsonEncode({
+      'format': backupFormat,
+      'version': 2,
+      'notes': [
+        note.toPlainMap(),
+        {'title': 'missing id'},
+      ],
+    });
+    expect(() => decodeBackup(content), throwsFormatException);
   });
 }
