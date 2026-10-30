@@ -39,8 +39,6 @@ class CategoryFilterBar extends ConsumerWidget {
               child: FilterChip(
                 label: Text(cat),
                 selected: selected == cat,
-                selectedColor: AppColors.lightAccent.withValues(alpha: 0.2),
-                checkmarkColor: AppColors.lightAccent,
                 onSelected: (_) => onSelected(cat),
               ),
             ),

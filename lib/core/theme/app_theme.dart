@@ -30,6 +30,9 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.lightBg,
       colorScheme: const ColorScheme.light(
         primary: AppColors.lightAccent,
+        // Selected chips (category and #tag filters).
+        secondaryContainer: Color(0xFFCCFBF1),
+        onSecondaryContainer: Color(0xFF134E4A),
         surface: AppColors.lightSurface,
         onSurface: AppColors.lightText,
         error: AppColors.danger,
@@ -106,6 +109,8 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.darkBg,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.darkAccent,
+        secondaryContainer: Color(0xFF134E4A),
+        onSecondaryContainer: Color(0xFFCCFBF1),
         surface: AppColors.darkSurface,
         onSurface: AppColors.darkText,
         error: AppColors.danger,

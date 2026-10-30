@@ -162,8 +162,6 @@ class _TagFilterBar extends StatelessWidget {
       child: FilterChip(
         label: Text(label),
         selected: selected == tag,
-        selectedColor: AppColors.lightAccent.withValues(alpha: 0.2),
-        checkmarkColor: AppColors.lightAccent,
         onSelected: (_) => onSelected(tag),
       ),
     );
