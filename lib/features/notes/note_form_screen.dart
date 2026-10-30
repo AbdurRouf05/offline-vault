@@ -134,7 +134,11 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
               const SizedBox(height: 14),
               TextFormField(
                 controller: _contentController,
-                maxLines: 15,
+                // Grow with the content so long lists scroll with the page
+                // instead of inside a fixed-height box.
+                minLines: 12,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
                 decoration: const InputDecoration(
                   labelText: 'Isi Catatan *',
                   hintText: 'Tulis memo atau catatan rahasia di sini...',
