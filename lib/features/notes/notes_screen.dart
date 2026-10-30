@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/app_state.dart';
 import 'package:offline_vault/core/theme/app_theme.dart';
+import 'package:offline_vault/features/notes/note_detail_screen.dart';
 import 'package:offline_vault/features/notes/note_form_screen.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 
@@ -171,7 +172,7 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                             context,
                             MaterialPageRoute<void>(
                               builder: (context) =>
-                                  NoteFormScreen(existingNote: note),
+                                  NoteDetailScreen(note: note),
                             ),
                           );
                         },
