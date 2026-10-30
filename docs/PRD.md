@@ -4,7 +4,7 @@
 > Technical "how" lives in `docs/PROJECT.md`. Look & language live in `docs/DESIGN.md`.
 
 - **Last updated:** 2026-10-30
-- **Status:** agreed
+- **Status:** agreed, revised 2026-10-30 by ADR 0002: notes-only app, no PIN, no Kredensial, backup without password. Sections marked "(dibatalkan)" no longer apply.
 
 ## 1. Problem statement
 Banyak pengguna memerlukan tempat penyimpanan kredensial sensitif (akun, password, PIN, recovery key) dan catatan pribadi tanpa risiko kebocoran cloud, ketergantungan server pihak ketiga, atau pelacakan telemetri. Ketika berganti perangkat (Android atau iOS), pengguna sering kesulitan memindahkan brankas offline secara aman tanpa harus mengunggah data mereka ke server luar.
@@ -28,12 +28,10 @@ Banyak pengguna memerlukan tempat penyimpanan kredensial sensitif (akun, passwor
 | Privacy-conscious user | Pengguna smartphone (Android / iOS) yang mengutamakan privasi dan kedaulatan data lokal | Menyimpan kredensial & catatan tanpa koneksi internet dan bisa dipindahkan saat ganti HP |
 
 ## 4. Scope
-**MVP (v1):**
-- Autentikasi Pengguna: Setup Master PIN/Password dan opsi buka cepat via Biometrik (Fingerprint / Face Unlock).
-- Brankas Kredensial: Tambah, lihat, salin, ubah, dan hapus akun (layanan, username/email, password, URL, catatan rahasia).
-- Generator Password: Pembangkit password acak dengan kustomisasi panjang, angka, dan simbol.
-- Catatan Offline: Catatan teks dengan judul, isi, tag/kategori, dan filter pencarian cepat.
-- Cadangan & Pemulihan (Backup/Restore): Ekspor brankas menjadi file terenkripsi (.vault) dengan password cadangan mandiri, serta impor file cadangan untuk migrasi perangkat.
+**MVP (v1, setelah ADR 0002):**
+- Catatan Offline: catatan teks dengan judul, isi, kategori yang bisa diedit, `#tag` untuk filter di dalam catatan, dan pencarian cepat. Aplikasi langsung terbuka ke Catatan tanpa PIN.
+- Cadangan & Pemulihan: ekspor semua catatan ke satu file `.vault` (JSON biasa, tanpa password) dan impor di HP lain.
+- (dibatalkan) Master PIN dan biometrik, Brankas Kredensial, Generator Password, cadangan dengan password.
 
 **Later:**
 - TOTP 2FA Authenticator (penyimpan kode OTP offline).
@@ -46,14 +44,14 @@ Banyak pengguna memerlukan tempat penyimpanan kredensial sensitif (akun, passwor
 
 ## 5. User stories & acceptance criteria
 
-### US-01 — Setup Master PIN & Buka Kunci Biometrik
+### US-01 — Setup Master PIN & Buka Kunci Biometrik (dibatalkan, ADR 0002)
 As a **pengguna**, I want **mengatur Master PIN saat pertama kali membuka aplikasi dan mengaktifkan biometrik**, so that **data saya aman dari akses fisik yang tidak berhak**.
 - Given aplikasi baru dipasang, when dibuka, then sistem meminta membuat Master PIN 6 digit dan konfirmasi.
 - Given Master PIN sudah dibuat dan perangkat mendukung biometrik, when login berikutnya, then sistem menawarkan otentikasi biometrik.
 - Given salah PIN 5 kali berturut-turut, when percobaan berikutnya, then sistem memberlakukan cooldown 30 detik.
 - Priority: must
 
-### US-02 — Manajemen Kredensial & Generator Password
+### US-02 — Manajemen Kredensial & Generator Password (dibatalkan, ADR 0002)
 As a **pengguna**, I want **menyimpan detail akun dan menghasilkan password yang kuat**, so that **saya tidak perlu mengingat banyak password rumit**.
 - Given form tambah kredensial, when pengguna memasukkan layanan, username, password, then data tersimpan secara terenkripsi di database lokal.
 - Given daftar kredensial, when tombol salin ditekan, then password tersalin ke clipboard dan clipboard otomatis dibersihkan dalam 45 detik.
@@ -68,9 +66,9 @@ As a **pengguna**, I want **mencatat informasi penting secara cepat dengan tag/k
 
 ### US-04 — Ekspor & Impor Cadangan Terenkripsi (Migrasi HP)
 As a **pengguna yang berganti smartphone**, I want **mengekspor seluruh data ke dalam file cadangan terenkripsi dan mengimpornya di ponsel baru**, so that **saya dapat memindahkan seluruh data tanpa mengunggahnya ke internet**.
-- Given opsi ekspor cadangan, when pengguna memasukkan password cadangan, then sistem membuat file `.vault` terenkripsi AES-256-GCM.
-- Given file cadangan `.vault`, when diimpor di ponsel baru dengan password yang benar, then seluruh catatan dan kredensial dipulihkan seutuhnya.
-- Given password cadangan salah saat impor, when didekripsi, then sistem menolak file dan data yang ada tidak terkorupsi.
+- Given opsi ekspor cadangan, when ditekan, then sistem membuat file `.vault` berisi semua catatan dan membuka menu bagikan (tanpa password, ADR 0002).
+- Given file cadangan `.vault`, when diimpor di ponsel baru, then seluruh catatan dipulihkan seutuhnya.
+- Given file yang bukan cadangan Offline Vault, when diimpor, then sistem menolak file dan data yang ada tidak berubah.
 - Priority: must
 
 ## 6. Non-functional requirements
@@ -85,20 +83,14 @@ As a **pengguna yang berganti smartphone**, I want **mengekspor seluruh data ke 
 ## 7. Key flows
 ```mermaid
 flowchart TD
-  A["Buka Aplikasi"] --> B{"Sudah ada Master PIN?"}
-  B -->|"Belum"| C["Setup Master PIN & Biometrik"]
-  B -->|"Sudah"| D["Prompt Biometrik / Masukkan PIN"]
-  C --> E["Dashboard Utama"]
-  D -->|"Valid"| E
-  E --> F["Menu Kredensial"]
-  E --> G["Menu Catatan"]
-  E --> H["Cadangan & Migrasi"]
-  H --> I["Ekspor .vault Terenkripsi"]
+  A["Buka Aplikasi"] --> G["Catatan"]
+  G --> H["Pengaturan: Cadangan & Migrasi"]
+  H --> I["Ekspor .vault"]
   H --> J["Impor .vault dari Ponsel Lama"]
 ```
 
 ## 8. Assumptions, risks, open questions
 - Assumption: Pengguna bertanggung jawab menjaga keamanan file cadangan dan password cadangannya saat proses transfer file antar-HP.
 - Risk: Pengguna lupa Master PIN dan tidak memiliki file cadangan -> mitigasi: beri peringatan tegas di awal bahwa tanpa cloud, Master PIN tidak dapat di-reset oleh pihak manapun.
-- Open question: Apakah perlu opsi ekspor plain JSON untuk arsip manual non-enkripsi? (Diputuskan: Tidak disarankan demi keamanan; semua ekspor wajib dilindungi password enkripsi).
+- Open question: Apakah perlu opsi ekspor plain JSON untuk arsip manual non-enkripsi? (Awalnya diputuskan tidak; diubah 2026-10-30 oleh ADR 0002: ekspor tanpa password atas permintaan pengguna).
 
