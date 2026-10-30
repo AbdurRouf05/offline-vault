@@ -27,7 +27,7 @@
 - Untagged anime (unsure of genre): rinkan biyaku, Ochi mono torare, rakasha street. "top 5" lines are left untagged on purpose.
 
 ## Next steps
-1. Phone: `adb devices` must show `device`. Then `adb -s 115413743T006083 install -r build/app/outputs/flutter-apk/app-debug.apk`, `adb push build/anime.vault /sdcard/Download/`, and launch the app.
+1. DONE 2026-10-30: APK installed, `anime.vault` pushed to /sdcard/Download/, app running with no errors in logcat. Note: run `adb push` from PowerShell, because Git Bash rewrites `/sdcard/...` into a Windows path.
 2. The user imports it via Pengaturan > Impor (password anime123). Afterwards delete the file from the phone (`adb shell rm /sdcard/Download/anime.vault`) and delete `build/anime.vault` and `build/anime_note.txt`.
 3. Credentials seed: ask the user to paste them again. Parse them into JSON {title, username, password, url, category, notes} with categories Email / Game / Medsos / Keuangan / Kerja / Akun Web / Lainnya. Feed the JSON via stdin or a temp file in build/, generate the vault, push it, import it, then delete every plaintext and vault file. Recommend that the user changes important passwords (bank, Dana, Indodax, PayPal, Google), since they were pasted into a chat.
 4. Later: an export/import test between two phones, then `flutter build apk --release`.
