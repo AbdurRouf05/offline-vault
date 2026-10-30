@@ -34,6 +34,7 @@
 None.
 
 ## Log (newest first)
+- 2026-10-30 — feat!: no PIN (ADR 0002). Notes are encrypted with a random key created on first launch in secure storage (`data_key_service.dart`, `dataKeyProvider`); the app opens straight to the dashboard. Removed lock screen, biometric, Ganti PIN, Kunci Brankas, `reEncryptAll`, `local_auth` and the biometric permission. Tests: `test/data_key_test.dart` (replaces `security_test.dart`).
 - 2026-10-30 — refactor(backup): `.vault` encode/decode moved to pure `backup_codec.dart` (used by `BackupService`); new `tool/make_seed_vault.dart` builds an encrypted seed `.vault` from JSON on stdin (password via `SEED_VAULT_PASSWORD`, output in gitignored `build/`). Tests: `test/backup_codec_test.dart`.
 - 2026-10-30 — feat(notes): `#tags` in note content become filter chips in read mode ("Semua" + `#tag (count)`); selecting one shows only tagged lines under their `## ` headings. Headings render bold, tags muted. Logic in `note_tags.dart`. Tests: `test/note_tags_test.dart`, `test/note_detail_test.dart`.
 - 2026-10-30 — feat(categories): category UI — shared filter bar with "Kelola" button, Kelola Kategori screen (add/rename/delete), form dropdown with "+ Kategori baru". Wired into notes and credentials. Tests: `test/category_widgets_test.dart`.

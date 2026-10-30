@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/app_state.dart';
 import 'package:offline_vault/core/theme/app_theme.dart';
-import 'package:offline_vault/features/auth/lock_screen.dart';
 import 'package:offline_vault/features/dashboard/dashboard_screen.dart';
 
 void main() {
@@ -15,7 +14,7 @@ class OfflineVaultApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionKey = ref.watch(sessionKeyProvider);
+    final dataKey = ref.watch(dataKeyProvider);
 
     return MaterialApp(
       title: 'Offline Vault',
@@ -23,7 +22,22 @@ class OfflineVaultApp extends ConsumerWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
-      home: sessionKey == null ? const LockScreen() : const DashboardScreen(),
+      home: dataKey.when(
+        data: (_) => const DashboardScreen(),
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) => Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'Penyimpanan HP tidak bisa dibuka: $error',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

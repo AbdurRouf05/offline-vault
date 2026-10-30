@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:cryptography/cryptography.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,219 +14,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _biometricAvailable = false;
-  bool _biometricEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final security = ref.read(securityServiceProvider);
-    final available = await security.isBiometricAvailable();
-    final enabled = await security.isBiometricEnabled();
-
-    if (mounted) {
-      setState(() {
-        _biometricAvailable = available;
-        _biometricEnabled = enabled;
-      });
-    }
-  }
-
-  void _toggleBiometric(bool val) async {
-    final security = ref.read(securityServiceProvider);
-    if (!val) {
-      await security.setBiometricEnabled(false);
-      if (mounted) setState(() => _biometricEnabled = false);
-      return;
-    }
-
-    // Biometric unlock needs the PIN cached, so confirm it before enabling.
-    final pin = await _askCurrentPin();
-    if (pin == null) return;
-
-    if (await security.verifyAndDeriveKey(pin) == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PIN salah. Biometrik tidak diaktifkan.'),
-          ),
-        );
-      }
-      return;
-    }
-
-    await security.enableBiometricWithPin(pin);
-    if (mounted) setState(() => _biometricEnabled = true);
-  }
-
-  Future<String?> _askCurrentPin() {
-    final pinCtrl = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('Konfirmasi Master PIN'),
-        content: TextField(
-          controller: pinCtrl,
-          obscureText: true,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Master PIN',
-            prefixIcon: Icon(Icons.lock_outline),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, pinCtrl.text.trim()),
-            child: const Text('Aktifkan'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showChangePinDialog() {
-    final oldPinCtrl = TextEditingController();
-    final newPinCtrl = TextEditingController();
-    final confirmPinCtrl = TextEditingController();
-    String? errorText;
-
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              title: const Text('Ganti Master PIN'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (errorText != null) ...[
-                      Text(
-                        errorText!,
-                        style: const TextStyle(
-                          color: AppColors.danger,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                    TextField(
-                      controller: oldPinCtrl,
-                      obscureText: true,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'PIN Lama',
-                        prefixIcon: Icon(Icons.lock_outline),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: newPinCtrl,
-                      obscureText: true,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'PIN Baru (Min. 6 Digit)',
-                        prefixIcon: Icon(Icons.password_outlined),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: confirmPinCtrl,
-                      obscureText: true,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Konfirmasi PIN Baru',
-                        prefixIcon: Icon(Icons.check_circle_outline),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Batal'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(100, 40),
-                  ),
-                  onPressed: () async {
-                    final oldPin = oldPinCtrl.text.trim();
-                    final newPin = newPinCtrl.text.trim();
-                    final confirm = confirmPinCtrl.text.trim();
-
-                    if (newPin.length < 6) {
-                      setDialogState(
-                        () => errorText = 'PIN baru minimal harus 6 karakter.',
-                      );
-                      return;
-                    }
-                    if (newPin != confirm) {
-                      setDialogState(
-                        () => errorText = 'Konfirmasi PIN baru tidak cocok.',
-                      );
-                      return;
-                    }
-
-                    final security = ref.read(securityServiceProvider);
-                    final db = ref.read(databaseServiceProvider);
-                    final SecretKey? key;
-                    try {
-                      key = await security.changeMasterPin(
-                        oldPin,
-                        newPin,
-                        reEncrypt: db.reEncryptAll,
-                      );
-                    } catch (_) {
-                      setDialogState(
-                        () => errorText =
-                            'Gagal mengganti PIN. Data tidak diubah, PIN lama tetap berlaku.',
-                      );
-                      return;
-                    }
-                    if (key == null) {
-                      setDialogState(
-                        () => errorText = 'PIN lama yang dimasukkan salah.',
-                      );
-                      return;
-                    }
-
-                    ref.read(sessionKeyProvider.notifier).setKey(key);
-
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Master PIN berhasil diperbarui'),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text('Simpan'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   void _exportBackup() {
     final passwordCtrl = TextEditingController();
     String? errorText;
@@ -290,10 +76,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       return;
                     }
 
-                    final key = ref.read(sessionKeyProvider);
-                    if (key == null) return;
-
                     Navigator.pop(context);
+                    final key = await ref.read(dataKeyProvider.future);
 
                     try {
                       final backupService = ref.read(backupServiceProvider);
@@ -409,8 +193,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       return;
                     }
 
-                    final key = ref.read(sessionKeyProvider);
-                    if (key == null) return;
+                    final key = await ref.read(dataKeyProvider.future);
 
                     final backupService = ref.read(backupServiceProvider);
                     try {
@@ -458,10 +241,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _lockVault() {
-    ref.read(sessionKeyProvider.notifier).setKey(null);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -469,40 +248,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'KEAMANAN & AKSES',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-              letterSpacing: 1.1,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Card(
-            child: Column(
-              children: [
-                if (_biometricAvailable) ...[
-                  SwitchListTile(
-                    title: const Text('Buka dengan Biometrik'),
-                    subtitle: const Text('Fingerprint atau Face Unlock'),
-                    value: _biometricEnabled,
-                    activeThumbColor: AppColors.lightAccent,
-                    onChanged: _toggleBiometric,
-                  ),
-                  const Divider(height: 1),
-                ],
-                ListTile(
-                  leading: const Icon(Icons.password_outlined),
-                  title: const Text('Ganti Master PIN'),
-                  subtitle: const Text('Ubah kode keamanan pembuka brankas'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: _showChangePinDialog,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
           const Text(
             'MIGRASI DATA (OFFLINE)',
             style: TextStyle(
@@ -584,16 +329,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.danger,
-              foregroundColor: Colors.white,
-            ),
-            icon: const Icon(Icons.lock),
-            label: const Text('Kunci Brankas Sekarang'),
-            onPressed: _lockVault,
           ),
         ],
       ),

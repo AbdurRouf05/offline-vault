@@ -1,13 +1,13 @@
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/database/database_service.dart';
-import 'package:offline_vault/core/security/security_service.dart';
+import 'package:offline_vault/core/security/data_key_service.dart';
 import 'package:offline_vault/features/backup/backup_service.dart';
 import 'package:offline_vault/features/credentials/credential_item.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 
-final securityServiceProvider = Provider<SecurityService>((ref) {
-  return SecurityService();
+final dataKeyServiceProvider = Provider<DataKeyService>((ref) {
+  return DataKeyService();
 });
 
 final databaseServiceProvider = Provider<DatabaseService>((ref) {
@@ -18,32 +18,22 @@ final backupServiceProvider = Provider<BackupService>((ref) {
   return BackupService();
 });
 
-class SessionKeyNotifier extends Notifier<SecretKey?> {
-  @override
-  SecretKey? build() => null;
-
-  void setKey(SecretKey? key) {
-    state = key;
-  }
-}
-
-final sessionKeyProvider = NotifierProvider<SessionKeyNotifier, SecretKey?>(
-  SessionKeyNotifier.new,
-);
+/// Key that encrypts notes at rest, loaded (or created) once at startup.
+final dataKeyProvider = FutureProvider<SecretKey>((ref) {
+  return ref.watch(dataKeyServiceProvider).loadOrCreateKey();
+});
 
 class CredentialsNotifier extends AsyncNotifier<List<CredentialItem>> {
   @override
   Future<List<CredentialItem>> build() async {
-    final key = ref.watch(sessionKeyProvider);
+    final key = await ref.watch(dataKeyProvider.future);
     final db = ref.watch(databaseServiceProvider);
-    if (key == null) return [];
     return await db.getAllCredentials(key);
   }
 
   Future<void> addOrUpdate(CredentialItem item) async {
-    final key = ref.read(sessionKeyProvider);
+    final key = await ref.read(dataKeyProvider.future);
     final db = ref.read(databaseServiceProvider);
-    if (key == null) return;
     await db.saveCredential(item, key);
     ref.invalidateSelf();
   }
@@ -68,16 +58,14 @@ final credentialsProvider =
 class NotesNotifier extends AsyncNotifier<List<NoteItem>> {
   @override
   Future<List<NoteItem>> build() async {
-    final key = ref.watch(sessionKeyProvider);
+    final key = await ref.watch(dataKeyProvider.future);
     final db = ref.watch(databaseServiceProvider);
-    if (key == null) return [];
     return await db.getAllNotes(key);
   }
 
   Future<void> addOrUpdate(NoteItem item) async {
-    final key = ref.read(sessionKeyProvider);
+    final key = await ref.read(dataKeyProvider.future);
     final db = ref.read(databaseServiceProvider);
-    if (key == null) return;
     await db.saveNote(item, key);
     ref.invalidateSelf();
   }
