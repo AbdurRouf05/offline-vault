@@ -34,6 +34,7 @@
 None.
 
 ## Log (newest first)
+- 2026-10-30 — refactor(backup): `.vault` encode/decode moved to pure `backup_codec.dart` (used by `BackupService`); new `tool/make_seed_vault.dart` builds an encrypted seed `.vault` from JSON on stdin (password via `SEED_VAULT_PASSWORD`, output in gitignored `build/`). Tests: `test/backup_codec_test.dart`.
 - 2026-10-30 — feat(notes): `#tags` in note content become filter chips in read mode ("Semua" + `#tag (count)`); selecting one shows only tagged lines under their `## ` headings. Headings render bold, tags muted. Logic in `note_tags.dart`. Tests: `test/note_tags_test.dart`, `test/note_detail_test.dart`.
 - 2026-10-30 — feat(categories): category UI — shared filter bar with "Kelola" button, Kelola Kategori screen (add/rename/delete), form dropdown with "+ Kategori baru". Wired into notes and credentials. Tests: `test/category_widgets_test.dart`.
 - 2026-10-30 — feat(categories): data layer for user-editable categories (`lib/features/categories/`): list logic, persistence in `app_metadata`, rename/delete moves items. Tests: `test/category_list_test.dart`.
