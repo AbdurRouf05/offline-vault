@@ -38,25 +38,22 @@ class NoteItem {
   }
 
   Map<String, dynamic> toPlainMap() => {
-        'id': id,
-        'title': title,
-        'content': content,
-        'category': category,
-        'is_pinned': isPinned ? 1 : 0,
-        'created_at': createdAt.millisecondsSinceEpoch,
-        'updated_at': updatedAt.millisecondsSinceEpoch,
-      };
+    'id': id,
+    'title': title,
+    'content': content,
+    'category': category,
+    'is_pinned': isPinned ? 1 : 0,
+    'created_at': createdAt.millisecondsSinceEpoch,
+    'updated_at': updatedAt.millisecondsSinceEpoch,
+  };
 
   factory NoteItem.fromPlainMap(Map<String, dynamic> map) => NoteItem(
-        id: map['id'] as String,
-        title: map['title'] as String,
-        content: map['content'] as String? ?? '',
-        category: map['category'] as String? ?? 'general',
-        isPinned: (map['is_pinned'] as int? ?? 0) == 1,
-        createdAt:
-            DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-        updatedAt:
-            DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
-      );
+    id: map['id'] as String,
+    title: map['title'] as String,
+    content: map['content'] as String? ?? '',
+    category: map['category'] as String? ?? 'general',
+    isPinned: (map['is_pinned'] as int? ?? 0) == 1,
+    createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+    updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+  );
 }
-

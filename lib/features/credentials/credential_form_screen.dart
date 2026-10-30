@@ -170,10 +170,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
                         icon: const Icon(Icons.vpn_key_outlined),
                         tooltip: 'Generator Password',
                         onPressed: () async {
-                          final generated =
-                              await showDialog<String>(
+                          final generated = await showDialog<String>(
                             context: context,
-                            builder: (context) => const PasswordGeneratorDialog(),
+                            builder: (context) =>
+                                const PasswordGeneratorDialog(),
                           );
                           if (generated != null && generated.isNotEmpty) {
                             setState(() {
@@ -217,7 +217,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 icon: const Icon(Icons.save_outlined),
-                label: Text(isEditing ? 'Perbarui Kredensial' : 'Simpan Kredensial'),
+                label: Text(
+                  isEditing ? 'Perbarui Kredensial' : 'Simpan Kredensial',
+                ),
                 onPressed: _save,
               ),
             ],

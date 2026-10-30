@@ -170,9 +170,7 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
           child: const Text('Batal'),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(120, 42),
-          ),
+          style: ElevatedButton.styleFrom(minimumSize: const Size(120, 42)),
           onPressed: () {
             widget.onSelect?.call(_generated);
             Navigator.pop(context, _generated);
@@ -183,4 +181,3 @@ class _PasswordGeneratorDialogState extends State<PasswordGeneratorDialog> {
     );
   }
 }
-

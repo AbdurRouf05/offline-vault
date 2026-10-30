@@ -62,9 +62,7 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
     final notesState = ref.watch(notesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Catatan Offline'),
-      ),
+      appBar: AppBar(title: const Text('Catatan Offline')),
       body: Column(
         children: [
           Padding(
@@ -96,8 +94,7 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                   child: FilterChip(
                     label: Text(cat),
                     selected: isSelected,
-                    selectedColor:
-                        AppColors.lightAccent.withValues(alpha: 0.2),
+                    selectedColor: AppColors.lightAccent.withValues(alpha: 0.2),
                     checkmarkColor: AppColors.lightAccent,
                     onSelected: (val) {
                       setState(() => _selectedCategory = cat);
@@ -111,17 +108,18 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
           Expanded(
             child: notesState.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(
-                child: Text('Gagal memuat catatan: $err'),
-              ),
+              error: (err, _) =>
+                  Center(child: Text('Gagal memuat catatan: $err')),
               data: (List<NoteItem> items) {
                 final query = _searchController.text.trim().toLowerCase();
                 final filtered = items.where((item) {
-                  final matchQuery = query.isEmpty ||
+                  final matchQuery =
+                      query.isEmpty ||
                       item.title.toLowerCase().contains(query) ||
                       item.content.toLowerCase().contains(query);
 
-                  final matchCat = _selectedCategory == 'Semua' ||
+                  final matchCat =
+                      _selectedCategory == 'Semua' ||
                       item.category == _selectedCategory;
 
                   return matchQuery && matchCat;
@@ -203,10 +201,13 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                   ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 2),
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.lightAccent
-                                          .withValues(alpha: 0.12),
+                                      color: AppColors.lightAccent.withValues(
+                                        alpha: 0.12,
+                                      ),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
@@ -219,8 +220,11 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline,
-                                        size: 18, color: Colors.grey),
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      size: 18,
+                                      color: Colors.grey,
+                                    ),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     onPressed: () => _confirmDelete(note),

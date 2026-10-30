@@ -27,8 +27,9 @@ class SessionKeyNotifier extends Notifier<SecretKey?> {
   }
 }
 
-final sessionKeyProvider =
-    NotifierProvider<SessionKeyNotifier, SecretKey?>(SessionKeyNotifier.new);
+final sessionKeyProvider = NotifierProvider<SessionKeyNotifier, SecretKey?>(
+  SessionKeyNotifier.new,
+);
 
 class CredentialsNotifier extends AsyncNotifier<List<CredentialItem>> {
   @override
@@ -61,7 +62,8 @@ class CredentialsNotifier extends AsyncNotifier<List<CredentialItem>> {
 
 final credentialsProvider =
     AsyncNotifierProvider<CredentialsNotifier, List<CredentialItem>>(
-        CredentialsNotifier.new);
+      CredentialsNotifier.new,
+    );
 
 class NotesNotifier extends AsyncNotifier<List<NoteItem>> {
   @override
@@ -92,5 +94,6 @@ class NotesNotifier extends AsyncNotifier<List<NoteItem>> {
   }
 }
 
-final notesProvider =
-    AsyncNotifierProvider<NotesNotifier, List<NoteItem>>(NotesNotifier.new);
+final notesProvider = AsyncNotifierProvider<NotesNotifier, List<NoteItem>>(
+  NotesNotifier.new,
+);

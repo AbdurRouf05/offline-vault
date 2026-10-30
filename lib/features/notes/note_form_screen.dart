@@ -102,7 +102,10 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
             children: [
               TextFormField(
                 controller: _titleController,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
                 decoration: const InputDecoration(
                   labelText: 'Judul Catatan *',
                   hintText: 'Misal: Rencana Mingguan, Ide Proyek',

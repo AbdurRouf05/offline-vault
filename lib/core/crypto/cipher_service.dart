@@ -15,10 +15,10 @@ class EncryptedPayload {
   });
 
   Map<String, dynamic> toJson() => {
-        'c': cipherTextBase64,
-        'n': nonceBase64,
-        'm': macBase64,
-      };
+    'c': cipherTextBase64,
+    'n': nonceBase64,
+    'm': macBase64,
+  };
 
   factory EncryptedPayload.fromJson(Map<String, dynamic> json) =>
       EncryptedPayload(
@@ -56,10 +56,7 @@ class CipherService {
   /// Encrypt plaintext with SecretKey using AES-256-GCM
   Future<EncryptedPayload> encryptText(String plainText, SecretKey key) async {
     final bytes = utf8.encode(plainText);
-    final secretBox = await _aesGcm.encrypt(
-      bytes,
-      secretKey: key,
-    );
+    final secretBox = await _aesGcm.encrypt(bytes, secretKey: key);
 
     return EncryptedPayload(
       cipherTextBase64: base64Encode(secretBox.cipherText),
@@ -74,16 +71,9 @@ class CipherService {
     final nonce = base64Decode(payload.nonceBase64);
     final macBytes = base64Decode(payload.macBase64);
 
-    final secretBox = SecretBox(
-      cipherText,
-      nonce: nonce,
-      mac: Mac(macBytes),
-    );
+    final secretBox = SecretBox(cipherText, nonce: nonce, mac: Mac(macBytes));
 
-    final decryptedBytes = await _aesGcm.decrypt(
-      secretBox,
-      secretKey: key,
-    );
+    final decryptedBytes = await _aesGcm.decrypt(secretBox, secretKey: key);
 
     return utf8.decode(decryptedBytes);
   }
@@ -149,4 +139,3 @@ class CipherService {
     return allChars.join();
   }
 }
-

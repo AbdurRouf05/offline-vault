@@ -55,7 +55,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
+                borderRadius: BorderRadius.circular(14),
+              ),
               title: const Text('Ganti Master PIN'),
               content: SingleChildScrollView(
                 child: Column(
@@ -65,7 +66,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Text(
                         errorText!,
                         style: const TextStyle(
-                            color: AppColors.danger, fontSize: 13),
+                          color: AppColors.danger,
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 10),
                     ],
@@ -116,22 +119,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     final confirm = confirmPinCtrl.text.trim();
 
                     if (newPin.length < 6) {
-                      setDialogState(() =>
-                          errorText = 'PIN baru minimal harus 6 karakter.');
+                      setDialogState(
+                        () => errorText = 'PIN baru minimal harus 6 karakter.',
+                      );
                       return;
                     }
                     if (newPin != confirm) {
                       setDialogState(
-                          () => errorText = 'Konfirmasi PIN baru tidak cocok.');
+                        () => errorText = 'Konfirmasi PIN baru tidak cocok.',
+                      );
                       return;
                     }
 
                     final security = ref.read(securityServiceProvider);
-                    final key =
-                        await security.changeMasterPin(oldPin, newPin);
+                    final key = await security.changeMasterPin(oldPin, newPin);
                     if (key == null) {
                       setDialogState(
-                          () => errorText = 'PIN lama yang dimasukkan salah.');
+                        () => errorText = 'PIN lama yang dimasukkan salah.',
+                      );
                       return;
                     }
 
@@ -141,7 +146,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Master PIN berhasil diperbarui')),
+                          content: Text('Master PIN berhasil diperbarui'),
+                        ),
                       );
                     }
                   },
@@ -166,7 +172,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
+                borderRadius: BorderRadius.circular(14),
+              ),
               title: const Text('Ekspor Cadangan Terenkripsi'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -181,7 +188,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Text(
                       errorText!,
                       style: const TextStyle(
-                          color: AppColors.danger, fontSize: 13),
+                        color: AppColors.danger,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -207,8 +216,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onPressed: () async {
                     final pwd = passwordCtrl.text.trim();
                     if (pwd.length < 6) {
-                      setDialogState(() =>
-                          errorText = 'Password cadangan minimal 6 karakter.');
+                      setDialogState(
+                        () =>
+                            errorText = 'Password cadangan minimal 6 karakter.',
+                      );
                       return;
                     }
 
@@ -236,7 +247,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                              content: Text('Gagal mengekspor cadangan: $e')),
+                            content: Text('Gagal mengekspor cadangan: $e'),
+                          ),
                         );
                       }
                     }
@@ -271,7 +283,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
+                borderRadius: BorderRadius.circular(14),
+              ),
               title: const Text('Impor Cadangan (.vault)'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -280,7 +293,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Text(
                     'File: ${files.first.name}',
                     style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.bold),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
@@ -292,7 +307,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Text(
                       errorText!,
                       style: const TextStyle(
-                          color: AppColors.danger, fontSize: 13),
+                        color: AppColors.danger,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -318,8 +335,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onPressed: () async {
                     final pwd = passwordCtrl.text.trim();
                     if (pwd.isEmpty) {
-                      setDialogState(() =>
-                          errorText = 'Password cadangan tidak boleh kosong.');
+                      setDialogState(
+                        () =>
+                            errorText = 'Password cadangan tidak boleh kosong.',
+                      );
                       return;
                     }
 
@@ -328,8 +347,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                     final backupService = ref.read(backupServiceProvider);
                     try {
-                      final summary =
-                          await backupService.importEncryptedBackup(
+                      final summary = await backupService.importEncryptedBackup(
                         backupFile: file,
                         backupPassword: pwd,
                         targetSessionKey: key,
@@ -357,8 +375,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         );
                       }
                     } catch (_) {
-                      setDialogState(() => errorText =
-                          'Password salah atau file cadangan rusak / tidak valid.');
+                      setDialogState(
+                        () => errorText =
+                            'Password salah atau file cadangan rusak / tidak valid.',
+                      );
                     }
                   },
                   child: const Text('Pulihkan Data'),
@@ -378,9 +398,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pengaturan & Migrasi'),
-      ),
+      appBar: AppBar(title: const Text('Pengaturan & Migrasi')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -432,20 +450,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.file_upload_outlined,
-                      color: AppColors.lightAccent),
+                  leading: const Icon(
+                    Icons.file_upload_outlined,
+                    color: AppColors.lightAccent,
+                  ),
                   title: const Text('Ekspor Cadangan (.vault)'),
                   subtitle: const Text(
-                      'Simpan dan bagikan file terenkripsi untuk dipindah ke HP baru'),
+                    'Simpan dan bagikan file terenkripsi untuk dipindah ke HP baru',
+                  ),
                   onTap: _exportBackup,
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.file_download_outlined,
-                      color: AppColors.lightAccent),
+                  leading: const Icon(
+                    Icons.file_download_outlined,
+                    color: AppColors.lightAccent,
+                  ),
                   title: const Text('Impor Cadangan (.vault)'),
                   subtitle: const Text(
-                      'Pulihkan kredensial & catatan dari file ponsel lama'),
+                    'Pulihkan kredensial & catatan dari file ponsel lama',
+                  ),
                   onTap: _importBackup,
                 ),
               ],
@@ -470,20 +494,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.wifi_off,
-                          size: 20, color: AppColors.success),
+                      Icon(Icons.wifi_off, size: 20, color: AppColors.success),
                       SizedBox(width: 8),
                       Text(
                         '100% Offline Tanpa Izin Internet',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
                   SizedBox(height: 8),
                   Text(
                     'Aplikasi ini tidak memiliki izin akses jaringan. Seluruh data dienkripsi dengan standar AES-256-GCM langsung di penyimpanan internal perangkat Anda.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey, height: 1.4),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                      height: 1.4,
+                    ),
                   ),
                 ],
               ),

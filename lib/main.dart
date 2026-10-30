@@ -7,11 +7,7 @@ import 'package:offline_vault/features/dashboard/dashboard_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    const ProviderScope(
-      child: OfflineVaultApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: OfflineVaultApp()));
 }
 
 class OfflineVaultApp extends ConsumerWidget {

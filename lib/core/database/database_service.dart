@@ -11,7 +11,7 @@ class DatabaseService {
   final CipherService _cipherService;
 
   DatabaseService({CipherService? cipherService})
-      : _cipherService = cipherService ?? CipherService();
+    : _cipherService = cipherService ?? CipherService();
 
   Future<Database> get database async {
     if (_db != null) return _db!;
@@ -73,21 +73,17 @@ class DatabaseService {
     final encPass = await _cipherService.encryptText(item.password, key);
     final encNotes = await _cipherService.encryptText(item.notes, key);
 
-    await db.insert(
-      'credentials',
-      {
-        'id': item.id,
-        'title': item.title,
-        'username': encUser.serialize(),
-        'password': encPass.serialize(),
-        'url': item.url,
-        'category': item.category,
-        'notes': encNotes.serialize(),
-        'created_at': item.createdAt.millisecondsSinceEpoch,
-        'updated_at': item.updatedAt.millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert('credentials', {
+      'id': item.id,
+      'title': item.title,
+      'username': encUser.serialize(),
+      'password': encPass.serialize(),
+      'url': item.url,
+      'category': item.category,
+      'notes': encNotes.serialize(),
+      'created_at': item.createdAt.millisecondsSinceEpoch,
+      'updated_at': item.updatedAt.millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<CredentialItem>> getAllCredentials(SecretKey key) async {
@@ -105,19 +101,23 @@ class DatabaseService {
         final password = await _cipherService.decryptText(encPass, key);
         final notes = await _cipherService.decryptText(encNotes, key);
 
-        results.add(CredentialItem(
-          id: row['id'] as String,
-          title: row['title'] as String,
-          username: username,
-          password: password,
-          url: (row['url'] as String?) ?? '',
-          category: (row['category'] as String?) ?? 'general',
-          notes: notes,
-          createdAt:
-              DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
-          updatedAt:
-              DateTime.fromMillisecondsSinceEpoch(row['updated_at'] as int),
-        ));
+        results.add(
+          CredentialItem(
+            id: row['id'] as String,
+            title: row['title'] as String,
+            username: username,
+            password: password,
+            url: (row['url'] as String?) ?? '',
+            category: (row['category'] as String?) ?? 'general',
+            notes: notes,
+            createdAt: DateTime.fromMillisecondsSinceEpoch(
+              row['created_at'] as int,
+            ),
+            updatedAt: DateTime.fromMillisecondsSinceEpoch(
+              row['updated_at'] as int,
+            ),
+          ),
+        );
       } catch (_) {
         // Skip corrupted or un-decryptable item
       }
@@ -137,19 +137,15 @@ class DatabaseService {
 
     final encContent = await _cipherService.encryptText(item.content, key);
 
-    await db.insert(
-      'notes',
-      {
-        'id': item.id,
-        'title': item.title,
-        'content': encContent.serialize(),
-        'category': item.category,
-        'is_pinned': item.isPinned ? 1 : 0,
-        'created_at': item.createdAt.millisecondsSinceEpoch,
-        'updated_at': item.updatedAt.millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert('notes', {
+      'id': item.id,
+      'title': item.title,
+      'content': encContent.serialize(),
+      'category': item.category,
+      'is_pinned': item.isPinned ? 1 : 0,
+      'created_at': item.createdAt.millisecondsSinceEpoch,
+      'updated_at': item.updatedAt.millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<NoteItem>> getAllNotes(SecretKey key) async {
@@ -162,21 +158,26 @@ class DatabaseService {
     final results = <NoteItem>[];
     for (final row in rows) {
       try {
-        final encContent =
-            EncryptedPayload.deserialize(row['content'] as String);
+        final encContent = EncryptedPayload.deserialize(
+          row['content'] as String,
+        );
         final content = await _cipherService.decryptText(encContent, key);
 
-        results.add(NoteItem(
-          id: row['id'] as String,
-          title: row['title'] as String,
-          content: content,
-          category: (row['category'] as String?) ?? 'general',
-          isPinned: (row['is_pinned'] as int? ?? 0) == 1,
-          createdAt:
-              DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
-          updatedAt:
-              DateTime.fromMillisecondsSinceEpoch(row['updated_at'] as int),
-        ));
+        results.add(
+          NoteItem(
+            id: row['id'] as String,
+            title: row['title'] as String,
+            content: content,
+            category: (row['category'] as String?) ?? 'general',
+            isPinned: (row['is_pinned'] as int? ?? 0) == 1,
+            createdAt: DateTime.fromMillisecondsSinceEpoch(
+              row['created_at'] as int,
+            ),
+            updatedAt: DateTime.fromMillisecondsSinceEpoch(
+              row['updated_at'] as int,
+            ),
+          ),
+        );
       } catch (_) {
         // Skip corrupted item
       }
@@ -195,4 +196,3 @@ class DatabaseService {
     await db.delete('notes');
   }
 }
-

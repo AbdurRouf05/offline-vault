@@ -18,9 +18,9 @@ class SecurityService {
     FlutterSecureStorage? storage,
     LocalAuthentication? localAuth,
     CipherService? cipherService,
-  })  : _storage = storage ?? const FlutterSecureStorage(),
-        _localAuth = localAuth ?? LocalAuthentication(),
-        _cipherService = cipherService ?? CipherService();
+  }) : _storage = storage ?? const FlutterSecureStorage(),
+       _localAuth = localAuth ?? LocalAuthentication(),
+       _cipherService = cipherService ?? CipherService();
 
   /// Check if Master PIN has already been initialized
   Future<bool> isMasterPinSet() async {
@@ -34,14 +34,8 @@ class SecurityService {
     final key = await _cipherService.deriveKeyFromPassword(pin, salt);
     final keyBytes = await key.extractBytes();
 
-    await _storage.write(
-      key: _keyMasterPinSalt,
-      value: base64Encode(salt),
-    );
-    await _storage.write(
-      key: _keyMasterPinHash,
-      value: base64Encode(keyBytes),
-    );
+    await _storage.write(key: _keyMasterPinSalt, value: base64Encode(salt));
+    await _storage.write(key: _keyMasterPinHash, value: base64Encode(keyBytes));
 
     // If biometric was previously enabled, update cached pin
     if (await isBiometricEnabled()) {
@@ -89,8 +83,7 @@ class SecurityService {
   /// Check device biometric capability
   Future<bool> isBiometricAvailable() async {
     try {
-      final canAuthenticateWithBiometrics =
-          await _localAuth.canCheckBiometrics;
+      final canAuthenticateWithBiometrics = await _localAuth.canCheckBiometrics;
       final canAuthenticate =
           canAuthenticateWithBiometrics || await _localAuth.isDeviceSupported();
       return canAuthenticate;

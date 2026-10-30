@@ -34,5 +34,6 @@
 None.
 
 ## Log (newest first)
+- 2026-10-30 — style: apply `dart format` to lib/ and test/ (code was failing the format check).
 - 2026-10-30 — feat: Implement core MVP (Master PIN, Biometrics, Credential Vault, Notes, Encrypted .vault Export/Import) with 100% passing tests.
 - 2026-10-30 — setup: Initial scaffold, quality gates, cipher service unit tests passing, docs completed.

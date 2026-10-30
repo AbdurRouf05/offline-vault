@@ -12,10 +12,7 @@ class ImportSummary {
   final int credentialCount;
   final int noteCount;
 
-  const ImportSummary({
-    required this.credentialCount,
-    required this.noteCount,
-  });
+  const ImportSummary({required this.credentialCount, required this.noteCount});
 }
 
 class BackupService {
@@ -25,16 +22,17 @@ class BackupService {
   BackupService({
     CipherService? cipherService,
     DatabaseService? databaseService,
-  })  : _cipherService = cipherService ?? CipherService(),
-        _databaseService = databaseService ?? DatabaseService();
+  }) : _cipherService = cipherService ?? CipherService(),
+       _databaseService = databaseService ?? DatabaseService();
 
   /// Export all credentials and notes to an encrypted .vault file
   Future<File> exportEncryptedBackup({
     required SecretKey activeSessionKey,
     required String backupPassword,
   }) async {
-    final credentials =
-        await _databaseService.getAllCredentials(activeSessionKey);
+    final credentials = await _databaseService.getAllCredentials(
+      activeSessionKey,
+    );
     final notes = await _databaseService.getAllNotes(activeSessionKey);
 
     final rawData = {
@@ -48,11 +46,15 @@ class BackupService {
 
     // Derive independent backup key using PBKDF2 and a fresh 32-byte salt
     final salt = _cipherService.generateRandomBytes(32);
-    final backupKey =
-        await _cipherService.deriveKeyFromPassword(backupPassword, salt);
+    final backupKey = await _cipherService.deriveKeyFromPassword(
+      backupPassword,
+      salt,
+    );
 
-    final encryptedPayload =
-        await _cipherService.encryptText(rawJson, backupKey);
+    final encryptedPayload = await _cipherService.encryptText(
+      rawJson,
+      backupKey,
+    );
 
     final envelope = {
       'format': 'OFFLINE_VAULT_BACKUP',
@@ -84,15 +86,19 @@ class BackupService {
 
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != 'OFFLINE_VAULT_BACKUP') {
-      throw const FormatException('Format file bukan cadangan Offline Vault yang sah.');
+      throw const FormatException(
+        'Format file bukan cadangan Offline Vault yang sah.',
+      );
     }
 
     final salt = base64Decode(decoded['salt'] as String);
     final payloadJson = decoded['payload'] as Map<String, dynamic>;
     final payload = EncryptedPayload.fromJson(payloadJson);
 
-    final backupKey =
-        await _cipherService.deriveKeyFromPassword(backupPassword, salt);
+    final backupKey = await _cipherService.deriveKeyFromPassword(
+      backupPassword,
+      salt,
+    );
 
     // If password is incorrect, AES-256-GCM authentication tag check fails here
     final rawJson = await _cipherService.decryptText(payload, backupKey);
@@ -115,10 +121,6 @@ class BackupService {
       noteCount++;
     }
 
-    return ImportSummary(
-      credentialCount: credCount,
-      noteCount: noteCount,
-    );
+    return ImportSummary(credentialCount: credCount, noteCount: noteCount);
   }
 }
-

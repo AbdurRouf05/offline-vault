@@ -46,30 +46,28 @@ class CredentialItem {
   }
 
   Map<String, dynamic> toPlainMap() => {
-        'id': id,
-        'title': title,
-        'username': username,
-        'password': password,
-        'url': url,
-        'category': category,
-        'notes': notes,
-        'created_at': createdAt.millisecondsSinceEpoch,
-        'updated_at': updatedAt.millisecondsSinceEpoch,
-      };
+    'id': id,
+    'title': title,
+    'username': username,
+    'password': password,
+    'url': url,
+    'category': category,
+    'notes': notes,
+    'created_at': createdAt.millisecondsSinceEpoch,
+    'updated_at': updatedAt.millisecondsSinceEpoch,
+  };
 
-  factory CredentialItem.fromPlainMap(Map<String, dynamic> map) =>
-      CredentialItem(
-        id: map['id'] as String,
-        title: map['title'] as String,
-        username: map['username'] as String? ?? '',
-        password: map['password'] as String? ?? '',
-        url: map['url'] as String? ?? '',
-        category: map['category'] as String? ?? 'general',
-        notes: map['notes'] as String? ?? '',
-        createdAt:
-            DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-        updatedAt:
-            DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
-      );
+  factory CredentialItem.fromPlainMap(
+    Map<String, dynamic> map,
+  ) => CredentialItem(
+    id: map['id'] as String,
+    title: map['title'] as String,
+    username: map['username'] as String? ?? '',
+    password: map['password'] as String? ?? '',
+    url: map['url'] as String? ?? '',
+    category: map['category'] as String? ?? 'general',
+    notes: map['notes'] as String? ?? '',
+    createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+    updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+  );
 }
-

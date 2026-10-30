@@ -38,11 +38,15 @@ void main() {
 
       const backupPassword = 'user_backup_password_123';
       final salt = cipher.generateRandomBytes(32);
-      final backupKey =
-          await cipher.deriveKeyFromPassword(backupPassword, salt);
+      final backupKey = await cipher.deriveKeyFromPassword(
+        backupPassword,
+        salt,
+      );
 
-      final encryptedPayload =
-          await cipher.encryptText(jsonEncode(rawData), backupKey);
+      final encryptedPayload = await cipher.encryptText(
+        jsonEncode(rawData),
+        backupKey,
+      );
 
       final envelope = {
         'format': 'OFFLINE_VAULT_BACKUP',
@@ -59,13 +63,15 @@ void main() {
       final decodedEnvelope =
           jsonDecode(serializedEnvelope) as Map<String, dynamic>;
       final targetSalt = base64Decode(decodedEnvelope['salt'] as String);
-      final targetPayload =
-          EncryptedPayload.fromJson(decodedEnvelope['payload'] as Map<String, dynamic>);
+      final targetPayload = EncryptedPayload.fromJson(
+        decodedEnvelope['payload'] as Map<String, dynamic>,
+      );
 
-      final targetKey =
-          await cipher.deriveKeyFromPassword(backupPassword, targetSalt);
-      final decryptedJson =
-          await cipher.decryptText(targetPayload, targetKey);
+      final targetKey = await cipher.deriveKeyFromPassword(
+        backupPassword,
+        targetSalt,
+      );
+      final decryptedJson = await cipher.decryptText(targetPayload, targetKey);
 
       final restoredData = jsonDecode(decryptedJson) as Map<String, dynamic>;
       final restoredCreds = (restoredData['credentials'] as List<dynamic>)
@@ -77,22 +83,26 @@ void main() {
       expect(restoredCreds.first.password, equals('super_secret_password'));
     });
 
-    test('should reject decryption when wrong backup password is provided',
-        () async {
-      const backupPassword = 'correct_password';
-      const wrongPassword = 'wrong_password';
+    test(
+      'should reject decryption when wrong backup password is provided',
+      () async {
+        const backupPassword = 'correct_password';
+        const wrongPassword = 'wrong_password';
 
-      final salt = cipher.generateRandomBytes(32);
-      final key = await cipher.deriveKeyFromPassword(backupPassword, salt);
-      final payload = await cipher.encryptText('secret_payload', key);
+        final salt = cipher.generateRandomBytes(32);
+        final key = await cipher.deriveKeyFromPassword(backupPassword, salt);
+        final payload = await cipher.encryptText('secret_payload', key);
 
-      final wrongKey = await cipher.deriveKeyFromPassword(wrongPassword, salt);
+        final wrongKey = await cipher.deriveKeyFromPassword(
+          wrongPassword,
+          salt,
+        );
 
-      expect(
-        () async => cipher.decryptText(payload, wrongKey),
-        throwsA(isA<Exception>()),
-      );
-    });
+        expect(
+          () async => cipher.decryptText(payload, wrongKey),
+          throwsA(isA<Exception>()),
+        );
+      },
+    );
   });
 }
-

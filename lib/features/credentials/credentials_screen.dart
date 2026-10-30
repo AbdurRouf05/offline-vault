@@ -86,7 +86,9 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.lightAccent.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
@@ -106,12 +108,16 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.person_outline),
-                    title: const Text('Username / Email',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    title: const Text(
+                      'Username / Email',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     subtitle: Text(
                       item.username,
                       style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w600),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.copy, size: 20),
@@ -124,8 +130,10 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.lock_outline),
-                    title: const Text('Password',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    title: const Text(
+                      'Password',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     subtitle: Text(
                       obscurePass ? '••••••••••••' : item.password,
                       style: const TextStyle(
@@ -162,8 +170,10 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.link_outlined),
-                      title: const Text('URL',
-                          style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      title: const Text(
+                        'URL',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
                       subtitle: Text(item.url),
                       trailing: IconButton(
                         icon: const Icon(Icons.copy, size: 20),
@@ -174,8 +184,10 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                   if (item.notes.isNotEmpty) ...[
                     const Divider(height: 1),
                     const SizedBox(height: 8),
-                    const Text('Catatan Rahasia',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const Text(
+                      'Catatan Rahasia',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     const SizedBox(height: 4),
                     Container(
                       width: double.infinity,
@@ -184,9 +196,10 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                         color: Theme.of(context).cardTheme.color,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withValues(alpha: 0.2)),
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: SelectableText(item.notes),
                     ),
@@ -196,10 +209,14 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          icon: const Icon(Icons.delete_outline,
-                              color: AppColors.danger),
-                          label: const Text('Hapus',
-                              style: TextStyle(color: AppColors.danger)),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: AppColors.danger,
+                          ),
+                          label: const Text(
+                            'Hapus',
+                            style: TextStyle(color: AppColors.danger),
+                          ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AppColors.danger),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -213,7 +230,8 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                               builder: (context) => AlertDialog(
                                 title: const Text('Hapus Kredensial?'),
                                 content: Text(
-                                    'Akun "${item.title}" akan dihapus permanen dari brankas lokal.'),
+                                  'Akun "${item.title}" akan dihapus permanen dari brankas lokal.',
+                                ),
                                 actions: [
                                   TextButton(
                                     onPressed: () =>
@@ -222,7 +240,8 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                                   ),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.danger),
+                                      backgroundColor: AppColors.danger,
+                                    ),
                                     onPressed: () =>
                                         Navigator.pop(context, true),
                                     child: const Text('Hapus'),
@@ -278,9 +297,7 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
     final credentialsState = ref.watch(credentialsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Brankas Kredensial'),
-      ),
+      appBar: AppBar(title: const Text('Brankas Kredensial')),
       body: Column(
         children: [
           Padding(
@@ -313,8 +330,7 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                   child: FilterChip(
                     label: Text(cat),
                     selected: isSelected,
-                    selectedColor:
-                        AppColors.lightAccent.withValues(alpha: 0.2),
+                    selectedColor: AppColors.lightAccent.withValues(alpha: 0.2),
                     checkmarkColor: AppColors.lightAccent,
                     onSelected: (val) {
                       setState(() => _selectedCategory = cat);
@@ -328,18 +344,19 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
           Expanded(
             child: credentialsState.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(
-                child: Text('Gagal memuat kredensial: $err'),
-              ),
+              error: (err, _) =>
+                  Center(child: Text('Gagal memuat kredensial: $err')),
               data: (List<CredentialItem> items) {
                 final query = _searchController.text.trim().toLowerCase();
                 final filtered = items.where((item) {
-                  final matchQuery = query.isEmpty ||
+                  final matchQuery =
+                      query.isEmpty ||
                       item.title.toLowerCase().contains(query) ||
                       item.username.toLowerCase().contains(query) ||
                       item.url.toLowerCase().contains(query);
 
-                  final matchCat = _selectedCategory == 'Semua' ||
+                  final matchCat =
+                      _selectedCategory == 'Semua' ||
                       item.category == _selectedCategory;
 
                   return matchQuery && matchCat;
@@ -383,8 +400,9 @@ class _CredentialsScreenState extends ConsumerState<CredentialsScreen> {
                       margin: const EdgeInsets.only(bottom: 10),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor:
-                              AppColors.lightAccent.withValues(alpha: 0.15),
+                          backgroundColor: AppColors.lightAccent.withValues(
+                            alpha: 0.15,
+                          ),
                           child: Text(
                             item.title.isNotEmpty
                                 ? item.title[0].toUpperCase()
