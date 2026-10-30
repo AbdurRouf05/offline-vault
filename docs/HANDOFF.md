@@ -6,7 +6,7 @@
 
 **Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** main · **Last commit:** see `git log -1` (docs commit after a16ec6d)
 
-## TL;DR
+- Repository: https://github.com/AbdurRouf05/offline-vault (public, main branch)
 - Project: Offline Vault is now a personal notes app (Flutter, Android), fully offline, with a one-file `.vault` backup to move notes to another phone. No PIN, no Kredensial (ADR 0002).
 - Now: the pivot is implemented and verified (analyze clean, 32 tests pass). The anime seed is rebuilt as v2 in `build/anime.vault`. The new debug APK is built, but NOT installed: adb showed no device.
 - Next: connect the phone, install the APK, push the seed, import it on the phone, check the UI, then delete the seed files.
