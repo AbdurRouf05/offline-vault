@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:offline_vault/features/credentials/credentials_screen.dart';
 import 'package:offline_vault/features/notes/notes_screen.dart';
 import 'package:offline_vault/features/settings/settings_screen.dart';
 
@@ -13,11 +12,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    CredentialsScreen(),
-    NotesScreen(),
-    SettingsScreen(),
-  ];
+  final List<Widget> _pages = const [NotesScreen(), SettingsScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +24,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           setState(() => _currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shield_outlined),
-            activeIcon: Icon(Icons.shield),
-            label: 'Kredensial',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.note_alt_outlined),
             activeIcon: Icon(Icons.note_alt),

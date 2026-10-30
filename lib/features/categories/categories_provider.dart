@@ -17,9 +17,6 @@ class CategoriesNotifier extends AsyncNotifier<List<String>> {
       CategoryScope.notes => (await ref.watch(
         notesProvider.future,
       )).map((n) => n.category),
-      CategoryScope.credentials => (await ref.watch(
-        credentialsProvider.future,
-      )).map((c) => c.category),
     };
     return mergeCategories(await _loadSaved(), used);
   }
@@ -67,8 +64,6 @@ class CategoriesNotifier extends AsyncNotifier<List<String>> {
     switch (scope) {
       case CategoryScope.notes:
         ref.invalidate(notesProvider);
-      case CategoryScope.credentials:
-        ref.invalidate(credentialsProvider);
     }
   }
 }
@@ -78,14 +73,8 @@ final noteCategoriesProvider =
       () => CategoriesNotifier(CategoryScope.notes),
     );
 
-final credentialCategoriesProvider =
-    AsyncNotifierProvider<CategoriesNotifier, List<String>>(
-      () => CategoriesNotifier(CategoryScope.credentials),
-    );
-
 AsyncNotifierProvider<CategoriesNotifier, List<String>> categoriesProviderFor(
   CategoryScope scope,
 ) => switch (scope) {
   CategoryScope.notes => noteCategoriesProvider,
-  CategoryScope.credentials => credentialCategoriesProvider,
 };

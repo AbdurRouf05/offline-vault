@@ -3,7 +3,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:offline_vault/core/crypto/cipher_service.dart';
-import 'package:offline_vault/features/credentials/credential_item.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 
 class DatabaseService {
@@ -28,20 +27,6 @@ class DatabaseService {
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''
-          CREATE TABLE credentials (
-            id TEXT PRIMARY KEY,
-            title TEXT NOT NULL,
-            username TEXT NOT NULL,
-            password TEXT NOT NULL,
-            url TEXT,
-            category TEXT DEFAULT 'general',
-            notes TEXT,
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL
-          )
-        ''');
-
-        await db.execute('''
           CREATE TABLE notes (
             id TEXT PRIMARY KEY,
             title TEXT NOT NULL,
@@ -62,72 +47,6 @@ class DatabaseService {
         ''');
       },
     );
-  }
-
-  // --- CREDENTIALS CRUD ---
-
-  Future<void> saveCredential(CredentialItem item, SecretKey key) async {
-    final db = await database;
-
-    final encUser = await _cipherService.encryptText(item.username, key);
-    final encPass = await _cipherService.encryptText(item.password, key);
-    final encNotes = await _cipherService.encryptText(item.notes, key);
-
-    await db.insert('credentials', {
-      'id': item.id,
-      'title': item.title,
-      'username': encUser.serialize(),
-      'password': encPass.serialize(),
-      'url': item.url,
-      'category': item.category,
-      'notes': encNotes.serialize(),
-      'created_at': item.createdAt.millisecondsSinceEpoch,
-      'updated_at': item.updatedAt.millisecondsSinceEpoch,
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  Future<List<CredentialItem>> getAllCredentials(SecretKey key) async {
-    final db = await database;
-    final rows = await db.query('credentials', orderBy: 'updated_at DESC');
-
-    final results = <CredentialItem>[];
-    for (final row in rows) {
-      try {
-        final encUser = EncryptedPayload.deserialize(row['username'] as String);
-        final encPass = EncryptedPayload.deserialize(row['password'] as String);
-        final encNotes = EncryptedPayload.deserialize(row['notes'] as String);
-
-        final username = await _cipherService.decryptText(encUser, key);
-        final password = await _cipherService.decryptText(encPass, key);
-        final notes = await _cipherService.decryptText(encNotes, key);
-
-        results.add(
-          CredentialItem(
-            id: row['id'] as String,
-            title: row['title'] as String,
-            username: username,
-            password: password,
-            url: (row['url'] as String?) ?? '',
-            category: (row['category'] as String?) ?? 'general',
-            notes: notes,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(
-              row['created_at'] as int,
-            ),
-            updatedAt: DateTime.fromMillisecondsSinceEpoch(
-              row['updated_at'] as int,
-            ),
-          ),
-        );
-      } catch (_) {
-        // Skip corrupted or un-decryptable item
-      }
-    }
-    return results;
-  }
-
-  Future<void> deleteCredential(String id) async {
-    final db = await database;
-    await db.delete('credentials', where: 'id = ?', whereArgs: [id]);
   }
 
   // --- NOTES CRUD ---
@@ -215,7 +134,7 @@ class DatabaseService {
   /// Move every row in [table] from category [from] to [to].
   /// [table] must be one of the app's own table names, never user input.
   Future<void> moveCategory(String table, String from, String to) async {
-    assert(table == 'notes' || table == 'credentials');
+    assert(table == 'notes');
     final db = await database;
     await db.update(
       table,
@@ -227,7 +146,6 @@ class DatabaseService {
 
   Future<void> clearAllData() async {
     final db = await database;
-    await db.delete('credentials');
     await db.delete('notes');
   }
 }

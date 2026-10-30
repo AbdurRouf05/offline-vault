@@ -33,7 +33,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Seluruh akun dan catatan akan dienkripsi dengan password cadangan ini (AES-256-GCM). Simpan password ini untuk memulihkan di HP baru.',
+                    'Seluruh catatan akan dienkripsi dengan password cadangan ini (AES-256-GCM). Simpan password ini untuk memulihkan di HP baru.',
                     style: TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                   const SizedBox(height: 14),
@@ -203,7 +203,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         targetSessionKey: key,
                       );
 
-                      await ref.read(credentialsProvider.notifier).refresh();
                       await ref.read(notesProvider.notifier).refresh();
 
                       if (context.mounted) {
@@ -213,7 +212,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           builder: (context) => AlertDialog(
                             title: const Text('Impor Berhasil'),
                             content: Text(
-                              'Dipulihkan:\n• ${summary.credentialCount} Akun Kredensial\n• ${summary.noteCount} Catatan',
+                              '${summary.noteCount} catatan dipulihkan.',
                             ),
                             actions: [
                               TextButton(
@@ -280,7 +279,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   title: const Text('Impor Cadangan (.vault)'),
                   subtitle: const Text(
-                    'Pulihkan kredensial & catatan dari file ponsel lama',
+                    'Pulihkan catatan dari file ponsel lama',
                   ),
                   onTap: _importBackup,
                 ),

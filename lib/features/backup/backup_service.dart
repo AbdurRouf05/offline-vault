@@ -7,10 +7,9 @@ import 'package:offline_vault/core/database/database_service.dart';
 import 'package:offline_vault/features/backup/backup_codec.dart';
 
 class ImportSummary {
-  final int credentialCount;
   final int noteCount;
 
-  const ImportSummary({required this.credentialCount, required this.noteCount});
+  const ImportSummary({required this.noteCount});
 }
 
 class BackupService {
@@ -23,13 +22,12 @@ class BackupService {
   }) : _cipherService = cipherService ?? CipherService(),
        _databaseService = databaseService ?? DatabaseService();
 
-  /// Export all credentials and notes to an encrypted .vault file
+  /// Export all notes to an encrypted .vault file
   Future<File> exportEncryptedBackup({
     required SecretKey activeSessionKey,
     required String backupPassword,
   }) async {
     final content = await encodeBackup(
-      credentials: await _databaseService.getAllCredentials(activeSessionKey),
       notes: await _databaseService.getAllNotes(activeSessionKey),
       password: backupPassword,
       cipher: _cipherService,
@@ -53,22 +51,16 @@ class BackupService {
     required String backupPassword,
     required SecretKey targetSessionKey,
   }) async {
-    final backup = await decodeBackup(
+    final notes = await decodeBackup(
       await backupFile.readAsString(),
       password: backupPassword,
       cipher: _cipherService,
     );
 
-    for (final item in backup.credentials) {
-      await _databaseService.saveCredential(item, targetSessionKey);
-    }
-    for (final item in backup.notes) {
+    for (final item in notes) {
       await _databaseService.saveNote(item, targetSessionKey);
     }
 
-    return ImportSummary(
-      credentialCount: backup.credentials.length,
-      noteCount: backup.notes.length,
-    );
+    return ImportSummary(noteCount: notes.length);
   }
 }

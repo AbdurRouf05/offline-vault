@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/database/database_service.dart';
 import 'package:offline_vault/core/security/data_key_service.dart';
 import 'package:offline_vault/features/backup/backup_service.dart';
-import 'package:offline_vault/features/credentials/credential_item.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 
 final dataKeyServiceProvider = Provider<DataKeyService>((ref) {
@@ -22,38 +21,6 @@ final backupServiceProvider = Provider<BackupService>((ref) {
 final dataKeyProvider = FutureProvider<SecretKey>((ref) {
   return ref.watch(dataKeyServiceProvider).loadOrCreateKey();
 });
-
-class CredentialsNotifier extends AsyncNotifier<List<CredentialItem>> {
-  @override
-  Future<List<CredentialItem>> build() async {
-    final key = await ref.watch(dataKeyProvider.future);
-    final db = ref.watch(databaseServiceProvider);
-    return await db.getAllCredentials(key);
-  }
-
-  Future<void> addOrUpdate(CredentialItem item) async {
-    final key = await ref.read(dataKeyProvider.future);
-    final db = ref.read(databaseServiceProvider);
-    await db.saveCredential(item, key);
-    ref.invalidateSelf();
-  }
-
-  Future<void> delete(String id) async {
-    final db = ref.read(databaseServiceProvider);
-    await db.deleteCredential(id);
-    ref.invalidateSelf();
-  }
-
-  Future<void> refresh() async {
-    ref.invalidateSelf();
-    await future;
-  }
-}
-
-final credentialsProvider =
-    AsyncNotifierProvider<CredentialsNotifier, List<CredentialItem>>(
-      CredentialsNotifier.new,
-    );
 
 class NotesNotifier extends AsyncNotifier<List<NoteItem>> {
   @override

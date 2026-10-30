@@ -1,21 +1,14 @@
 import 'dart:convert';
 import 'package:offline_vault/core/crypto/cipher_service.dart';
-import 'package:offline_vault/features/credentials/credential_item.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 
 /// Pure (no Flutter) encoding of the `.vault` backup format, shared by the
 /// app and `tool/make_seed_vault.dart`.
 const backupFormat = 'OFFLINE_VAULT_BACKUP';
 
-typedef BackupContents = ({
-  List<CredentialItem> credentials,
-  List<NoteItem> notes,
-});
-
-/// Encrypts [credentials] and [notes] with a key derived from [password]
+/// Encrypts [notes] with a key derived from [password]
 /// and returns the `.vault` file content.
 Future<String> encodeBackup({
-  required List<CredentialItem> credentials,
   required List<NoteItem> notes,
   required String password,
   CipherService? cipher,
@@ -24,7 +17,6 @@ Future<String> encodeBackup({
   final rawJson = jsonEncode({
     'version': 1,
     'exported_at': DateTime.now().millisecondsSinceEpoch,
-    'credentials': credentials.map((e) => e.toPlainMap()).toList(),
     'notes': notes.map((e) => e.toPlainMap()).toList(),
   });
 
@@ -43,7 +35,7 @@ Future<String> encodeBackup({
 
 /// Decrypts `.vault` file [content]. Throws [FormatException] for a file
 /// that is not a backup, and a decryption error for a wrong [password].
-Future<BackupContents> decodeBackup(
+Future<List<NoteItem>> decodeBackup(
   String content, {
   required String password,
   CipherService? cipher,
@@ -66,14 +58,8 @@ Future<BackupContents> decodeBackup(
   final rawJson = await cipherService.decryptText(payload, backupKey);
   final data = jsonDecode(rawJson) as Map<String, dynamic>;
 
-  return (
-    credentials: [
-      for (final raw in (data['credentials'] as List<dynamic>?) ?? [])
-        CredentialItem.fromPlainMap(raw as Map<String, dynamic>),
-    ],
-    notes: [
-      for (final raw in (data['notes'] as List<dynamic>?) ?? [])
-        NoteItem.fromPlainMap(raw as Map<String, dynamic>),
-    ],
-  );
+  return [
+    for (final raw in (data['notes'] as List<dynamic>?) ?? [])
+      NoteItem.fromPlainMap(raw as Map<String, dynamic>),
+  ];
 }

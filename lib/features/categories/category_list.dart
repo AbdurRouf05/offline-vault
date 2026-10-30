@@ -5,12 +5,6 @@ enum CategoryScope {
     metadataKey: 'categories_notes',
     fallback: 'Umum',
     defaults: ['Umum', 'Pribadi', 'Pekerjaan', 'Ide', 'Keuangan', 'Penting'],
-  ),
-  credentials(
-    table: 'credentials',
-    metadataKey: 'categories_credentials',
-    fallback: 'Lainnya',
-    defaults: ['Akun Web', 'Perbankan', 'Email', 'Medsos', 'Kerja', 'Lainnya'],
   );
 
   const CategoryScope({

@@ -5,13 +5,11 @@
 //   SEED_VAULT_PASSWORD=... dart run tool/make_seed_vault.dart build/seed.vault < seed.json
 //
 // Seed JSON:
-//   {"credentials": [{"title", "username", "password", "url", "category", "notes"}],
-//    "notes": [{"title", "content", "category", "is_pinned"}]}
+//   {"notes": [{"title", "content", "category", "is_pinned"}]}
 // Only "title" is required.
 import 'dart:convert';
 import 'dart:io';
 import 'package:offline_vault/features/backup/backup_codec.dart';
-import 'package:offline_vault/features/credentials/credential_item.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 import 'package:uuid/uuid.dart';
 
@@ -33,21 +31,6 @@ Future<void> main(List<String> args) async {
   String str(Map<String, dynamic> m, String key, [String fallback = '']) =>
       (m[key] as String?) ?? fallback;
 
-  final credentials = [
-    for (final raw in (seed['credentials'] as List<dynamic>?) ?? [])
-      if (raw case final Map<String, dynamic> m)
-        CredentialItem(
-          id: const Uuid().v4(),
-          title: str(m, 'title'),
-          username: str(m, 'username'),
-          password: str(m, 'password'),
-          url: str(m, 'url'),
-          category: str(m, 'category', 'Lainnya'),
-          notes: str(m, 'notes'),
-          createdAt: now,
-          updatedAt: now,
-        ),
-  ];
   final notes = [
     for (final raw in (seed['notes'] as List<dynamic>?) ?? [])
       if (raw case final Map<String, dynamic> m)
@@ -62,14 +45,7 @@ Future<void> main(List<String> args) async {
         ),
   ];
 
-  final content = await encodeBackup(
-    credentials: credentials,
-    notes: notes,
-    password: password,
-  );
+  final content = await encodeBackup(notes: notes, password: password);
   await File(args.single).writeAsString(content);
-  stdout.writeln(
-    'Wrote ${args.single}: ${credentials.length} credentials, '
-    '${notes.length} notes.',
-  );
+  stdout.writeln('Wrote ${args.single}: ${notes.length} notes.');
 }
