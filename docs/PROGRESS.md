@@ -14,7 +14,7 @@
   - US-03: Catatan Offline (buat memo, sematkan/pin catatan, kategori, pencarian teks, simpan terenkripsi).
   - US-04: Migrasi Data HP Offline (.vault) — Ekspor data ke file terenkripsi AES-256-GCM dengan password mandiri + Impor file .vault untuk transfer antar-HP.
   - Verify command `flutter analyze && flutter test` lolos 100% tanpa issue.
-- In progress: Selesai membangun MVP inti.
+- In progress: MVP selesai; bug ganti PIN & toggle biometrik sudah diperbaiki. Belum diuji di HP fisik (USB gagal handshake).
 - Broken / known issues: None.
 
 ## Next steps

@@ -28,3 +28,5 @@
 ### 2026-10-30 15:56
 **User:**
 > perbaiki yagn perlu di perbaiki
+
+**AI:** Fixed: change-PIN data loss (re-encrypt in transaction, tests) and settings biometric toggle not caching PIN; formatted codebase. Commits 2a3a166, 462935d, f885926. HANDOFF saved.
