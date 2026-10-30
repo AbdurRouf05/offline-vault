@@ -34,6 +34,7 @@
 None.
 
 ## Log (newest first)
+- 2026-10-30 — feat(notes): leaving the note form with unsaved changes asks Simpan / Buang / Batal (PopScope). Tests: `test/note_form_test.dart`.
 - 2026-10-30 — feat(notes): content field grows with the text (minLines 12, no max) so long lists scroll with the page.
 - 2026-10-30 — test: debug APK built and installed on Infinix X6853 (Android 16); app launches to the Master PIN setup screen with no errors in logcat. Manual testing by the user is next.
 - 2026-10-30 — fix: biometric unlock never worked when enabled from Settings — cause: toggle only set the flag, the PIN was never cached — fix: toggle now asks for and verifies the Master PIN, then calls `enableBiometricWithPin`.
