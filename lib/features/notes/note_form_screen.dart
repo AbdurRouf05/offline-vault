@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/app_state.dart';
+import 'package:offline_vault/features/categories/category_list.dart';
+import 'package:offline_vault/features/categories/category_widgets.dart';
 import 'package:offline_vault/core/theme/app_theme.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
 import 'package:uuid/uuid.dart';
@@ -22,15 +24,6 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
   String _selectedCategory = 'Umum';
   bool _isPinned = false;
 
-  final List<String> _categories = [
-    'Umum',
-    'Pribadi',
-    'Pekerjaan',
-    'Ide',
-    'Keuangan',
-    'Penting',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -38,7 +31,7 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
     _titleController = TextEditingController(text: note?.title ?? '');
     _contentController = TextEditingController(text: note?.content ?? '');
     _isPinned = note?.isPinned ?? false;
-    if (note != null && _categories.contains(note.category)) {
+    if (note != null) {
       _selectedCategory = note.category;
     }
   }
@@ -170,18 +163,10 @@ class _NoteFormScreenState extends ConsumerState<NoteFormScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedCategory,
-                  decoration: const InputDecoration(
-                    labelText: 'Kategori',
-                    prefixIcon: Icon(Icons.label_outline),
-                  ),
-                  items: _categories.map((cat) {
-                    return DropdownMenuItem(value: cat, child: Text(cat));
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) setState(() => _selectedCategory = val);
-                  },
+                CategoryDropdown(
+                  scope: CategoryScope.notes,
+                  value: _selectedCategory,
+                  onChanged: (val) => setState(() => _selectedCategory = val),
                 ),
                 const SizedBox(height: 14),
                 TextFormField(

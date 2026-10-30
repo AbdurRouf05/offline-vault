@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/app_state.dart';
+import 'package:offline_vault/features/categories/category_list.dart';
+import 'package:offline_vault/features/categories/category_widgets.dart';
 import 'package:offline_vault/features/credentials/credential_item.dart';
 import 'package:offline_vault/features/credentials/password_generator_dialog.dart';
 import 'package:uuid/uuid.dart';
@@ -26,15 +28,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
   String _selectedCategory = 'Akun Web';
   bool _obscurePassword = true;
 
-  final List<String> _categories = [
-    'Akun Web',
-    'Perbankan',
-    'Email',
-    'Medsos',
-    'Kerja',
-    'Lainnya',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -44,7 +37,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
     _passwordController = TextEditingController(text: item?.password ?? '');
     _urlController = TextEditingController(text: item?.url ?? '');
     _notesController = TextEditingController(text: item?.notes ?? '');
-    if (item != null && _categories.contains(item.category)) {
+    if (item != null) {
       _selectedCategory = item.category;
     }
   }
@@ -116,18 +109,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
                 },
               ),
               const SizedBox(height: 14),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: 'Kategori',
-                  prefixIcon: Icon(Icons.category_outlined),
-                ),
-                items: _categories.map((cat) {
-                  return DropdownMenuItem(value: cat, child: Text(cat));
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) setState(() => _selectedCategory = val);
-                },
+              CategoryDropdown(
+                scope: CategoryScope.credentials,
+                value: _selectedCategory,
+                onChanged: (val) => setState(() => _selectedCategory = val),
               ),
               const SizedBox(height: 14),
               TextFormField(

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:offline_vault/core/app_state.dart';
 import 'package:offline_vault/core/theme/app_theme.dart';
+import 'package:offline_vault/features/categories/categories_provider.dart';
+import 'package:offline_vault/features/categories/category_list.dart';
+import 'package:offline_vault/features/categories/category_widgets.dart';
 import 'package:offline_vault/features/notes/note_detail_screen.dart';
 import 'package:offline_vault/features/notes/note_form_screen.dart';
 import 'package:offline_vault/features/notes/note_item.dart';
@@ -15,17 +18,7 @@ class NotesScreen extends ConsumerStatefulWidget {
 
 class _NotesScreenState extends ConsumerState<NotesScreen> {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedCategory = 'Semua';
-
-  final List<String> _categories = [
-    'Semua',
-    'Umum',
-    'Pribadi',
-    'Pekerjaan',
-    'Ide',
-    'Keuangan',
-    'Penting',
-  ];
+  String _selectedCategory = allCategories;
 
   @override
   void dispose() {
@@ -60,6 +53,11 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final categories = ref.watch(noteCategoriesProvider).value;
+    final selectedCategory =
+        categories == null || categories.contains(_selectedCategory)
+        ? _selectedCategory
+        : allCategories;
     final notesState = ref.watch(notesProvider);
 
     return Scaffold(
@@ -84,26 +82,10 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
               onChanged: (val) => setState(() {}),
             ),
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Row(
-              children: _categories.map((cat) {
-                final isSelected = _selectedCategory == cat;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(cat),
-                    selected: isSelected,
-                    selectedColor: AppColors.lightAccent.withValues(alpha: 0.2),
-                    checkmarkColor: AppColors.lightAccent,
-                    onSelected: (val) {
-                      setState(() => _selectedCategory = cat);
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
+          CategoryFilterBar(
+            scope: CategoryScope.notes,
+            selected: selectedCategory,
+            onSelected: (cat) => setState(() => _selectedCategory = cat),
           ),
           const SizedBox(height: 8),
           Expanded(
@@ -120,8 +102,8 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                       item.content.toLowerCase().contains(query);
 
                   final matchCat =
-                      _selectedCategory == 'Semua' ||
-                      item.category == _selectedCategory;
+                      selectedCategory == allCategories ||
+                      item.category == selectedCategory;
 
                   return matchQuery && matchCat;
                 }).toList();
