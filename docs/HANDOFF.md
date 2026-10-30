@@ -4,7 +4,7 @@
 > Overwrite it (do not append) after every completed task and whenever the chat gets long.
 > Keep it under ~150 lines: facts and pointers, not a diary. Full user messages live in `docs/CHATLOG.md`.
 
-**Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** master · **Last commit:** see `git log -1` (docs commit after a16ec6d)
+**Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** main · **Last commit:** see `git log -1` (docs commit after a16ec6d)
 
 ## TL;DR
 - Project: Offline Vault is now a personal notes app (Flutter, Android), fully offline, with a one-file `.vault` backup to move notes to another phone. No PIN, no Kredensial (ADR 0002).
