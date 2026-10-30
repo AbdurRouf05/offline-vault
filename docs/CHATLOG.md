@@ -62,3 +62,9 @@
 ### 2026-10-30 17:07
 **User:**
 > gausah pin pin an lah ribet, bukan berankas, tapi catatan saja
+
+### 2026-10-30 21:09
+**User:**
+> lanjut
+
+**AI:** PIN dihapus (kunci data acak di secure storage), fitur Kredensial dihapus, cadangan .vault v2 JSON tanpa password, Pengaturan ditulis ulang, kontras chip mode gelap diperbaiki, dokumen diperbarui. Seed anime v2 dan APK baru siap; belum dipasang karena HP tidak terdeteksi adb.

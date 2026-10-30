@@ -1,14 +1,12 @@
 # Offline Vault
 
-A secure, 100% offline personal vault for credentials and private notes, with encrypted backup and migration support across mobile devices (Android & iOS).
+A personal, 100% offline notes app with a one-file backup to move notes to another phone (Android & iOS). No PIN, no account (ADR 0002).
 
 ## Features
 - **Zero Network Permission:** 100% offline, zero cloud telemetry or internet permissions.
-- **Hardware-Backed Master Auth:** Master PIN with PBKDF2 key derivation and native BiometricPrompt/FaceID unlocking.
-- **Credential Vault:** Store accounts, passwords, URLs, and secrets with AES-256-GCM encryption.
-- **Secure Password Generator:** Configurable entropy generator (length, uppercase, lowercase, numbers, symbols).
-- **Private Notes:** Plaintext/Markdown notes with categorization, pinning, and instant local search.
-- **Encrypted Migration (.vault):** One-click portable encrypted backup file for seamless phone-to-phone migration.
+- **Notes:** plain text notes with editable categories, pinning, local search, and `#tag` filters inside a note (`## ` lines are headings).
+- **Encrypted at rest:** note content is AES-256-GCM encrypted with a random key kept in Android Keystore / iOS Keychain. The app opens without a PIN.
+- **Phone-to-phone backup (.vault):** export all notes to one plain JSON file and import it on the other phone. The file has no password.
 
 ## Requirements
 - Flutter SDK 3.38+ (Dart 3.10+)

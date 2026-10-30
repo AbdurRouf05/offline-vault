@@ -8,25 +8,13 @@
 - DBML: copy the dbml block into https://dbdiagram.io for an interactive diagram.
 
 - **Database:** SQLite 3 (Offline on-device database)
-- **Encryption:** AES-256-GCM encrypted payloads for sensitive fields (`username`, `password`, `notes`, `content`).
+- **Encryption:** AES-256-GCM encrypted `notes.content`, key from `flutter_secure_storage` (`DataKeyService`). Databases created before ADR 0002 may still contain an unused `credentials` table.
 - **Naming:** tables plural snake_case, columns snake_case, PK `id`, timestamps `created_at`/`updated_at`.
 
 ## Diagram (mermaid)
 
 ```mermaid
 erDiagram
-  credentials {
-    string id PK
-    string title
-    string username "encrypted"
-    string password "encrypted"
-    string url
-    string category
-    string notes "encrypted"
-    int created_at
-    int updated_at
-  }
-
   notes {
     string id PK
     string title
@@ -47,18 +35,6 @@ erDiagram
 ## DBML
 
 ```dbml
-Table credentials {
-  id varchar [pk]
-  title varchar [not null]
-  username text [note: 'AES-256-GCM encrypted']
-  password text [note: 'AES-256-GCM encrypted']
-  url varchar
-  category varchar [default: 'general']
-  notes text [note: 'AES-256-GCM encrypted']
-  created_at integer [not null]
-  updated_at integer [not null]
-}
-
 Table notes {
   id varchar [pk]
   title varchar [not null]
