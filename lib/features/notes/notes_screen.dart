@@ -236,8 +236,10 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                 note.content,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black87,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                   fontSize: 13,
                                   height: 1.4,
                                 ),
