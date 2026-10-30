@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cryptography/cryptography.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -132,7 +133,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     }
 
                     final security = ref.read(securityServiceProvider);
-                    final key = await security.changeMasterPin(oldPin, newPin);
+                    final db = ref.read(databaseServiceProvider);
+                    final SecretKey? key;
+                    try {
+                      key = await security.changeMasterPin(
+                        oldPin,
+                        newPin,
+                        reEncrypt: db.reEncryptAll,
+                      );
+                    } catch (_) {
+                      setDialogState(
+                        () => errorText =
+                            'Gagal mengganti PIN. Data tidak diubah, PIN lama tetap berlaku.',
+                      );
+                      return;
+                    }
                     if (key == null) {
                       setDialogState(
                         () => errorText = 'PIN lama yang dimasukkan salah.',

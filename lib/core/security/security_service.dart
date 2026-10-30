@@ -32,6 +32,15 @@ class SecurityService {
   Future<SecretKey> setupMasterPin(String pin) async {
     final salt = _cipherService.generateRandomBytes(32);
     final key = await _cipherService.deriveKeyFromPassword(pin, salt);
+    await _persistMasterPin(pin, salt, key);
+    return key;
+  }
+
+  Future<void> _persistMasterPin(
+    String pin,
+    List<int> salt,
+    SecretKey key,
+  ) async {
     final keyBytes = await key.extractBytes();
 
     await _storage.write(key: _keyMasterPinSalt, value: base64Encode(salt));
@@ -41,8 +50,6 @@ class SecurityService {
     if (await isBiometricEnabled()) {
       await _storage.write(key: _keyBiometricPin, value: pin);
     }
-
-    return key;
   }
 
   /// Verify entered Master PIN against stored hash and return derived SecretKey
@@ -72,12 +79,25 @@ class SecurityService {
     return null;
   }
 
-  /// Change Master PIN
-  Future<SecretKey?> changeMasterPin(String oldPin, String newPin) async {
+  /// Change Master PIN. Stored data is encrypted with the PIN-derived key, so
+  /// [reEncrypt] must move all data from the old key to the new key. The new
+  /// PIN is only persisted after [reEncrypt] completes; if it throws, the old
+  /// PIN stays valid.
+  Future<SecretKey?> changeMasterPin(
+    String oldPin,
+    String newPin, {
+    required Future<void> Function(SecretKey oldKey, SecretKey newKey)
+    reEncrypt,
+  }) async {
     final oldKey = await verifyAndDeriveKey(oldPin);
     if (oldKey == null) return null;
 
-    return await setupMasterPin(newPin);
+    final salt = _cipherService.generateRandomBytes(32);
+    final newKey = await _cipherService.deriveKeyFromPassword(newPin, salt);
+
+    await reEncrypt(oldKey, newKey);
+    await _persistMasterPin(newPin, salt, newKey);
+    return newKey;
   }
 
   /// Check device biometric capability
