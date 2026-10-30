@@ -24,7 +24,7 @@
   - `f885926` fix: the biometric toggle in Settings never cached the PIN, so fingerprint unlock always failed. It now asks for and verifies the PIN.
 - In flight: nothing.
 - Verified: `flutter analyze` -> no issues; `flutter test` -> 8 passed; `dart format --set-exit-if-changed` -> 0 changed.
-- Not verified: anything on a real device (no device connected). The biometric fix has no automated test (UI + local_auth platform channel).
+- Device: Infinix X6853, Android 16, serial 115413743T006083. Debug APK installed and it launches fine. Manual flow test by the user is pending. The biometric fix has no automated test (UI + local_auth platform channel).
 
 ## Next steps
 1. Connect the phone. Windows showed "Unknown USB Device (Device Descriptor Request Failed)", VID_0000: a USB handshake failure, not a driver problem. Suggested: full shutdown of the laptop, restart the phone, clean the port, try another port/cable, or use Wireless debugging (`adb pair` / `adb connect`).
