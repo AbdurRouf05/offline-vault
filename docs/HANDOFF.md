@@ -4,48 +4,46 @@
 > Overwrite it (do not append) after every completed task and whenever the chat gets long.
 > Keep it under ~150 lines: facts and pointers, not a diary. Full user messages live in `docs/CHATLOG.md`.
 
-**Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** master · **Last commit:** f85b202 feat(notes): open notes in read mode before editing
+**Updated:** 2026-10-30 · **Model/tool:** Claude Opus 5.5 (Claude Code) · **Branch:** master · **Last commit:** f022b57 feat(backup): add pure backup codec and seed vault tool
 
 ## TL;DR
 - Project: Offline Vault, a personal Flutter (Android) password and notes vault, fully offline, with encrypted `.vault` export/import to move data to another phone.
-- Now: MVP done, two user-facing bugs fixed. Not yet run on a real phone.
-- Next: get the phone connected (USB or wireless debugging), `flutter run`, then test export on phone A and import on phone B.
-- Watch out: the user does NOT want stricter PIN/crypto hardening. Only fix things that break data or the backup/migration flow.
+- Now: editable categories, a hashtag genre filter in note read mode, and a seed `.vault` tool are done. The anime seed vault is built in `build/anime.vault`, but it is NOT on the phone yet because adb shows the phone as "unauthorized".
+- Next: the user authorizes USB debugging, then install the APK, push the vault, and the user imports it. After that comes the credentials seed (the user must paste the credentials again).
+- Watch out: the credentials are real and sensitive. Never write them in code, in docs, in CHATLOG or in git.
 
 ## What the user asked for (current request)
-- "jangan terlalu ketat soal sandi atau pin, ini saya pakai sendiri" / "saya hanya ingin aplikasi pindah di hp saya yang lain ... backup data" (2026-10-30)
-- "perbaiki yang perlu diperbaiki" (2026-10-30)
-- Interpreted as: fix bugs that cause data loss or broken features, skip security hardening.
+- Seed data to try the app: (1) one anime note that keeps their original list, filterable by genre; (2) editable categories (add as many as they like, rename); (3) about 70 personal account credentials as seed data (2026-10-30).
+- Anime rules: the first list is watched, in order, with ⭐ = favourite; "top 5" stays; the second list is to-watch, where empty numbers are already watched (dropped) and √/✓ = priority.
 
 ## State
 - Done in this request:
-  - `2a3a166` style: dart format for the whole codebase (it was failing the format check).
-  - `462935d` fix: changing the Master PIN made all data unreadable. Now `DatabaseService.reEncryptAll` re-encrypts in one transaction before the new PIN is saved. Tests: `test/security_test.dart`.
-  - `f885926` fix: the biometric toggle in Settings never cached the PIN, so fingerprint unlock always failed. It now asks for and verifies the PIN.
-  - Notes for long lists (user's real use case: a ~240-line anime list with star/check marks): `689f240` content field grows; `7f86735` unsaved-changes dialog (Simpan/Buang/Batal); `ff33c7e` preview text readable in dark mode; `f85b202` read mode screen (`note_detail_screen.dart`) with copy + edit.
-- In flight: nothing.
-- Verified: `flutter analyze` -> no issues; `flutter test` -> 14 passed; `dart format --set-exit-if-changed` -> 0 changed.
-- Device: Infinix X6853, Android 16, serial 115413743T006083. Latest debug APK (with notes changes) installed and launches fine. Manual flow test by the user is pending. The biometric fix has no automated test (UI + local_auth platform channel).
+  - `35db154` / `a12fca6` categories: data layer plus UI (filter bar "Kelola", Kelola Kategori screen, "+ Kategori baru" in forms), for notes and credentials.
+  - `136aa7b` notes: `#tags` become filter chips in read mode, tagged lines stay under their `## ` headings (`note_tags.dart`).
+  - `f022b57` backup: pure `backup_codec.dart` and `tool/make_seed_vault.dart` (JSON on stdin, password in `SEED_VAULT_PASSWORD`).
+  - `build/anime.vault` (gitignored): one note "List anime", category Anime, pinned, with genre tags. Backup password: `anime123` (seed only, no secrets in it). The plaintext source is `build/anime_note.txt`; delete it after import.
+  - The debug APK with all features is built at `build/app/outputs/flutter-apk/app-debug.apk` but not installed.
+- Verified: `flutter analyze` -> no issues; `flutter test` -> 34 passed.
+- Untagged anime (unsure of genre): rinkan biyaku, Ochi mono torare, rakasha street. "top 5" lines are left untagged on purpose.
 
 ## Next steps
-1. User runs the smoke test on the phone: setup PIN, add a credential and a note, change the PIN, and confirm the data is still readable.
-2. Test migration: export `.vault` on phone A, import on phone B, check the counts and contents.
-3. Then: `flutter build apk --release`.
+1. Phone: `adb devices` must show `device`. Then `adb -s 115413743T006083 install -r build/app/outputs/flutter-apk/app-debug.apk`, `adb push build/anime.vault /sdcard/Download/`, and launch the app.
+2. The user imports it via Pengaturan > Impor (password anime123). Afterwards delete the file from the phone (`adb shell rm /sdcard/Download/anime.vault`) and delete `build/anime.vault` and `build/anime_note.txt`.
+3. Credentials seed: ask the user to paste them again. Parse them into JSON {title, username, password, url, category, notes} with categories Email / Game / Medsos / Keuangan / Kerja / Akun Web / Lainnya. Feed the JSON via stdin or a temp file in build/, generate the vault, push it, import it, then delete every plaintext and vault file. Recommend that the user changes important passwords (bank, Dana, Indodax, PayPal, Google), since they were pasted into a chat.
+4. Later: an export/import test between two phones, then `flutter build apk --release`.
 
 ## Decisions and user preferences
-- Personal single-user app. No unrequested security hardening (key wrapping, lockout, FLAG_SECURE) - why: the user asked explicitly (2026-10-30).
-- Known but accepted: the stored "PIN hash" equals the data key, and the biometric PIN is cached in secure storage. Do not raise these again unless asked.
+- Personal single-user app. No unrequested security hardening - why: the user asked explicitly (2026-10-30).
+- Known but accepted: the stored "PIN hash" equals the data key, and the biometric PIN is cached in secure storage.
+- Seeding happens only through an encrypted `.vault` and the Impor feature, never through code. Credentials never go into git.
 - Replies in Bahasa Indonesia, no emoji.
 
 ## Gotchas and dead ends
-- `dart format lib test` reformats every file. Run it on its own before feature work so feature diffs stay clean (now done once).
-- No `sqflite_common_ffi` dev dependency, so DB code is not unit-tested. Key rotation is tested through the `reEncrypt` callback of `SecurityService.changeMasterPin`.
+- The Bash tool can mangle heredocs that contain `'` or `\n` inside python strings. Use the Write tool for data files and Edit for `'\n'` in Dart.
+- adb authorization keeps getting lost on this phone. The user has to tap Izinkan on the USB debugging dialog.
 - gitleaks is not installed; the pre-commit secret scan is skipped.
 
-## Open questions
-- None.
-
 ## Read first
-- `lib/core/security/security_service.dart` - PIN, key derivation, biometric.
-- `lib/features/backup/backup_service.dart` - `.vault` export/import (the user's main goal).
-- `lib/features/settings/settings_screen.dart` - UI for change PIN, biometric, export/import.
+- `lib/features/backup/backup_codec.dart`, `tool/make_seed_vault.dart` - seed and backup format.
+- `lib/features/notes/note_tags.dart`, `note_detail_screen.dart` - genre filter.
+- `lib/features/categories/` - editable categories.

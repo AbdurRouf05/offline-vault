@@ -42,3 +42,9 @@
 > catatan unutk ini yagn saya maksud : [pasted a ~240-line personal anime list note with star/check markers as an example of the note content they want to store]
 
 **AI:** User chose all 3 notes improvements. Done: growing content field, unsaved-changes guard, read mode; plus dark-mode preview color fix. 14 tests pass. Reinstalled on phone.
+
+### 2026-10-30 16:28
+**User:**
+> data itu tadi seeding saya ingin coba liat hasilnya, jadi utnuk catatan anime gitu ada filter kategorinya, cari nama anime2 iut dan kategorikan [pasted block REDACTED: ~70 personal account credentials (emails, passwords, PINs) - not logged for security] itu juga seeidng untuk kredensial
+
+**AI:** Added hashtag genre filter in note read mode (136aa7b), backup codec + seed vault tool (f022b57). Built build/anime.vault (anime note with genre tags). Phone shows unauthorized in adb, so install/import is pending. Credentials seed waits for the user to paste them again (not stored anywhere).
