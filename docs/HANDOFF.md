@@ -27,10 +27,9 @@
 - Device: Infinix X6853, Android 16, serial 115413743T006083. Debug APK installed and it launches fine. Manual flow test by the user is pending. The biometric fix has no automated test (UI + local_auth platform channel).
 
 ## Next steps
-1. Connect the phone. Windows showed "Unknown USB Device (Device Descriptor Request Failed)", VID_0000: a USB handshake failure, not a driver problem. Suggested: full shutdown of the laptop, restart the phone, clean the port, try another port/cable, or use Wireless debugging (`adb pair` / `adb connect`).
-2. `flutter run` on the phone. Smoke test: setup PIN, add a credential and a note, change the PIN, and confirm the data is still readable.
-3. Test migration: export `.vault` on phone A, import on phone B, check the counts and contents.
-4. Then: `flutter build apk --release`.
+1. User runs the smoke test on the phone: setup PIN, add a credential and a note, change the PIN, and confirm the data is still readable.
+2. Test migration: export `.vault` on phone A, import on phone B, check the counts and contents.
+3. Then: `flutter build apk --release`.
 
 ## Decisions and user preferences
 - Personal single-user app. No unrequested security hardening (key wrapping, lockout, FLAG_SECURE) - why: the user asked explicitly (2026-10-30).
