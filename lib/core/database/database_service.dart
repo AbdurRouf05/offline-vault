@@ -190,6 +190,41 @@ class DatabaseService {
     await db.delete('notes', where: 'id = ?', whereArgs: [id]);
   }
 
+  // --- METADATA ---
+
+  Future<String?> getMetadata(String key) async {
+    final db = await database;
+    final rows = await db.query(
+      'app_metadata',
+      columns: ['value'],
+      where: 'key = ?',
+      whereArgs: [key],
+    );
+    return rows.isEmpty ? null : rows.first['value'] as String;
+  }
+
+  Future<void> setMetadata(String key, String value) async {
+    final db = await database;
+    await db.insert('app_metadata', {
+      'key': key,
+      'value': value,
+      'updated_at': DateTime.now().millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  /// Move every row in [table] from category [from] to [to].
+  /// [table] must be one of the app's own table names, never user input.
+  Future<void> moveCategory(String table, String from, String to) async {
+    assert(table == 'notes' || table == 'credentials');
+    final db = await database;
+    await db.update(
+      table,
+      {'category': to},
+      where: 'category = ?',
+      whereArgs: [from],
+    );
+  }
+
   // --- KEY ROTATION ---
 
   /// Re-encrypt every encrypted column from [oldKey] to [newKey] in one

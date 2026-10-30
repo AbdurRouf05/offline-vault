@@ -34,6 +34,7 @@
 None.
 
 ## Log (newest first)
+- 2026-10-30 — feat(categories): data layer for user-editable categories (`lib/features/categories/`): list logic, persistence in `app_metadata`, rename/delete moves items. Tests: `test/category_list_test.dart`.
 - 2026-10-30 — feat(notes): tapping a note opens a read-only view (`note_detail_screen.dart`) with copy and edit buttons; edits happen only via "Ubah". Tests: `test/note_detail_test.dart`.
 - 2026-10-30 — fix(notes): note preview text was hardcoded black87, unreadable in dark mode — now uses colorScheme.onSurfaceVariant.
 - 2026-10-30 — feat(notes): leaving the note form with unsaved changes asks Simpan / Buang / Batal (PopScope). Tests: `test/note_form_test.dart`.
