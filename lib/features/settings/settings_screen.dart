@@ -39,8 +39,60 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _toggleBiometric(bool val) async {
     final security = ref.read(securityServiceProvider);
-    await security.setBiometricEnabled(val);
-    setState(() => _biometricEnabled = val);
+    if (!val) {
+      await security.setBiometricEnabled(false);
+      if (mounted) setState(() => _biometricEnabled = false);
+      return;
+    }
+
+    // Biometric unlock needs the PIN cached, so confirm it before enabling.
+    final pin = await _askCurrentPin();
+    if (pin == null) return;
+
+    if (await security.verifyAndDeriveKey(pin) == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('PIN salah. Biometrik tidak diaktifkan.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    await security.enableBiometricWithPin(pin);
+    if (mounted) setState(() => _biometricEnabled = true);
+  }
+
+  Future<String?> _askCurrentPin() {
+    final pinCtrl = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('Konfirmasi Master PIN'),
+        content: TextField(
+          controller: pinCtrl,
+          obscureText: true,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Master PIN',
+            prefixIcon: Icon(Icons.lock_outline),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, pinCtrl.text.trim()),
+            child: const Text('Aktifkan'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showChangePinDialog() {
